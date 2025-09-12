@@ -2,125 +2,142 @@ import pygame
 import sys
 import os
 import random
-import math  # 👈 IMPORTAR math para cos, sin, etc.
+import math  # 👈 Para coseno y demás
 from PIL import Image
 
-# Inicializar Pygame
+# ================== PYGAME INICIO ==================
 pygame.init()
 
-# Configuraciones de pantalla
+# Configuración de pantalla
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Aventura de Ekeko - Pygame")
+pygame.display.set_caption("Aventura de Ekeko - Pygame con Árbol Binario")
 
 # Colores
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
-BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
-YELLOW = (255, 255, 0)
-PURPLE = (255, 0, 255)
 
-# Configuraciones del juego
+# FPS
 FPS = 60
 clock = pygame.time.Clock()
 
-# 🏔️ DATOS DE LOS APUS (Jefes)
+# ================== DATOS ==================
 APUS_DATA = {
     "Huascarán": {"color": (255, 255, 255), "health": 100, "speed": 2, "size": 80},
-    "Coropuna": {"color": (200, 200, 255), "health": 90, "speed": 2.5, "size": 75},
     "Misti": {"color": (255, 150, 150), "health": 85, "speed": 3, "size": 70},
-    "Ampato": {"color": (150, 255, 150), "health": 95, "speed": 2.2, "size": 78},
-    "Sara Sara": {"color": (255, 200, 100), "health": 80, "speed": 3.2, "size": 65},
-    "Salkantay": {"color": (100, 200, 255), "health": 110, "speed": 1.8, "size": 85},
-    "Chachani": {"color": (200, 100, 255), "health": 88, "speed": 2.8, "size": 72},
-    "Ccarhuarazo": {"color": (255, 100, 200), "health": 92, "speed": 2.3, "size": 76},
-    "Rasuwillka": {"color": (100, 255, 200), "health": 87, "speed": 2.9, "size": 68},
-    "Hualca Hualca": {"color": (255, 255, 100), "health": 93, "speed": 2.4, "size": 74},
-    "Huarancante": {"color": (200, 255, 200), "health": 89, "speed": 2.7, "size": 71},
-    "Allincapac": {"color": (255, 200, 200), "health": 96, "speed": 2.1, "size": 79}
+    "Coropuna": {"color": (200, 200, 255), "health": 90, "speed": 2.5, "size": 75},
 }
 
-# 🎒 DATOS DE LOS ARTÍCULOS
 ARTICULOS_DATA = [
-    "Tumi", "Chacana", "Illa", "Torito", "Perro Viringo", "Cuy", "Qullqi", "Quispe",
-    "Qori", "Chuño", "Papa", "Maíz", "Calluha", "Cungalpo", "Hizanche", "Huashacara",
-    "Inti", "Killa", "Chaska"
+    "Tumi", "Chacana", "Illa", "Torito", "Papa", "Maíz", "Inti", "Killa", "Chaska"
 ]
 
+# ================== ÁRBOL BINARIO ==================
+class NodoArbol:
+    def __init__(self, valor, tipo="articulo"):
+        self.valor = valor
+        self.tipo = tipo  # "apu" o "articulo"
+        self.izquierda = None
+        self.derecha = None
+
+class ArbolJerarquico:
+    def __init__(self):
+        self.raiz = None
+
+    def insertar(self, valor, tipo="articulo"):
+        nuevo = NodoArbol(valor, tipo)
+        if not self.raiz:
+            self.raiz = nuevo
+        else:
+            self._insertar(self.raiz, nuevo)
+
+    def _insertar(self, nodo, nuevo):
+        if nuevo.valor < nodo.valor:
+            if nodo.izquierda is None:
+                nodo.izquierda = nuevo
+            else:
+                self._insertar(nodo.izquierda, nuevo)
+        else:
+            if nodo.derecha is None:
+                nodo.derecha = nuevo
+            else:
+                self._insertar(nodo.derecha, nuevo)
+
+    def mostrar_inorden(self, nodo=None):
+        if nodo is None:
+            nodo = self.raiz
+            if nodo is None:
+                return
+        if nodo.izquierda:
+            self.mostrar_inorden(nodo.izquierda)
+        print(f"{nodo.tipo.upper()} → {nodo.valor}")
+        if nodo.derecha:
+            self.mostrar_inorden(nodo.derecha)
+
+# ================== FUNCIONES ==================
 def load_gif_frames(gif_path):
-    """Carga todos los frames de un GIF y los convierte a superficies de Pygame"""
+    """Carga todos los frames de un GIF como superficies pygame"""
     try:
         gif = Image.open(gif_path)
         frames = []
-        
         for frame_num in range(gif.n_frames):
             gif.seek(frame_num)
             frame = gif.copy()
-            if frame.mode != 'RGBA':
-                frame = frame.convert('RGBA')
-            frame_data = frame.tobytes()
-            frame_surface = pygame.image.fromstring(frame_data, frame.size, 'RGBA')
+            if frame.mode != "RGBA":
+                frame = frame.convert("RGBA")
+            frame_surface = pygame.image.fromstring(frame.tobytes(), frame.size, "RGBA")
             frames.append(frame_surface)
-        
         return frames
     except Exception as e:
         print(f"Error cargando GIF {gif_path}: {e}")
         return None
 
+# ================== CLASES ==================
 class Player:
     def __init__(self, x, y, gif_path=None, scale_factor=1.0):
         self.scale_factor = scale_factor
         if gif_path and os.path.exists(gif_path):
             self.frames = load_gif_frames(gif_path)
             if self.frames:
-                if scale_factor != 1.0:
-                    scaled_frames = []
-                    for frame in self.frames:
-                        original_size = frame.get_size()
-                        new_width = int(original_size[0] * scale_factor)
-                        new_height = int(original_size[1] * scale_factor)
-                        scaled_frame = pygame.transform.scale(frame, (new_width, new_height))
-                        scaled_frames.append(scaled_frame)
-                    self.frames = scaled_frames
+                self.frames = [pygame.transform.scale(f, (int(f.get_width()*scale_factor),
+                                                          int(f.get_height()*scale_factor))) for f in self.frames]
                 self.image = self.frames[0]
                 self.original_frames = self.frames[:]
             else:
                 self.create_placeholder()
         else:
             self.create_placeholder()
-        
+
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        
         self.speed = 5
         self.vel_x = 0
         self.vel_y = 0
         self.on_ground = False
         self.gravity = 0.8
         self.jump_strength = -15
-        
         self.facing_right = True
         self.walking = False
         self.frame_index = 0
         self.animation_speed = 0.2
         self.animation_timer = 0
-        
         self.health = 100
         self.max_health = 100
         self.articulos_collected = []
-        
+        self.font = pygame.font.SysFont("Arial", 18, bold=True)
+
     def create_placeholder(self):
         self.frames = []
         width = int(40 * self.scale_factor)
         height = int(60 * self.scale_factor)
         colors = [(255, 100, 100), (100, 255, 100), (150, 100, 255), (255, 150, 100)]
-        for i in range(4):
+        for c in colors:
             frame = pygame.Surface((width, height), pygame.SRCALPHA)
-            frame.fill(colors[i])
+            frame.fill(c)
             self.frames.append(frame)
         self.image = self.frames[0]
         self.original_frames = self.frames[:]
@@ -154,10 +171,7 @@ class Player:
                 else:
                     self.image = self.original_frames[self.frame_index]
         else:
-            if not self.facing_right:
-                self.image = pygame.transform.flip(self.original_frames[0], True, False)
-            else:
-                self.image = self.original_frames[0]
+            self.image = self.original_frames[0]
 
     def handle_input(self, keys):
         self.vel_x = 0
@@ -170,7 +184,7 @@ class Player:
             self.vel_x = self.speed
             self.facing_right = True
             self.walking = True
-        if (keys[pygame.K_SPACE] or keys[pygame.K_UP] or keys[pygame.K_w]) and self.on_ground:
+        if (keys[pygame.K_SPACE] or keys[pygame.K_UP]) and self.on_ground:
             self.vel_y = self.jump_strength
             self.on_ground = False
 
@@ -182,36 +196,42 @@ class Player:
         return False
 
     def draw(self, screen):
+        # Dibuja al jugador
         screen.blit(self.image, self.rect)
-        health_bar_width = 60
-        health_bar_height = 8
-        health_x = self.rect.x
-        health_y = self.rect.y - 15
-        pygame.draw.rect(screen, RED, (health_x, health_y, health_bar_width, health_bar_height))
-        current_health_width = int((self.health / self.max_health) * health_bar_width)
-        pygame.draw.rect(screen, GREEN, (health_x, health_y, current_health_width, health_bar_height))
+        # Barra de vida
+        pygame.draw.rect(screen, RED, (self.rect.x, self.rect.y - 15, 60, 8))
+        pygame.draw.rect(screen, GREEN, (self.rect.x, self.rect.y - 15,
+                                         int((self.health / self.max_health) * 60), 8))
+        # Nombre
+        text_surface = self.font.render("Ekeko", True, WHITE)
+        text_rect = text_surface.get_rect(center=(self.rect.centerx, self.rect.top - 25))
+        screen.blit(text_surface, text_rect)
+
 
 class Apu:
     def __init__(self, name, x, y, gif_path=None):
         self.name = name
         self.data = APUS_DATA[name]
-        if gif_path and os.path.exists(gif_path):
-            self.frames = load_gif_frames(gif_path)
-            if self.frames:
-                size = self.data["size"]
-                self.frames = [pygame.transform.scale(frame, (size, size)) for frame in self.frames]
-                self.image = self.frames[0]
-                self.original_frames = self.frames[:]
-            else:
-                self.create_placeholder()
-        else:
-            self.create_placeholder()
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        self.size = self.data["size"]
         self.health = self.data["health"]
         self.max_health = self.data["health"]
         self.speed = self.data["speed"]
+
+        self.frames = None
+        if gif_path and os.path.exists(gif_path):
+            self.frames = load_gif_frames(gif_path)
+        if self.frames:
+            self.frames = [pygame.transform.scale(f, (self.size, self.size)) for f in self.frames]
+            self.image = self.frames[0]
+            self.original_frames = self.frames[:]
+        else:
+            self.image = pygame.Surface((self.size, self.size))
+            self.image.fill(self.data["color"])
+            self.original_frames = [self.image]
+
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
         self.vel_x = random.choice([-1, 1]) * self.speed
         self.vel_y = 0
         self.on_ground = False
@@ -220,22 +240,7 @@ class Apu:
         self.animation_timer = 0
         self.animation_speed = 0.15
         self.active = True
-
-    def create_placeholder(self):
-        size = self.data["size"]
-        color = self.data["color"]
-        self.frames = []
-        for i in range(3):
-            frame = pygame.Surface((size, size), pygame.SRCALPHA)
-            variation = 20 * i
-            adjusted_color = tuple(min(255, max(0, c + variation)) for c in color)
-            pygame.draw.circle(frame, adjusted_color, (size//2, size//2), size//2 - 5)
-            eye_size = size // 10
-            pygame.draw.circle(frame, BLACK, (size//3, size//3), eye_size)
-            pygame.draw.circle(frame, BLACK, (2*size//3, size//3), eye_size)
-            self.frames.append(frame)
-        self.image = self.frames[0]
-        self.original_frames = self.frames[:]
+        self.font = pygame.font.SysFont("Arial", 18, bold=True)
 
     def update(self, player):
         if not self.active:
@@ -253,8 +258,7 @@ class Apu:
             self.on_ground = True
         else:
             self.on_ground = False
-        distance_to_player = abs(self.rect.centerx - player.rect.centerx)
-        if distance_to_player < 200:
+        if abs(self.rect.centerx - player.rect.centerx) < 200:
             if self.rect.centerx < player.rect.centerx:
                 self.vel_x = abs(self.vel_x)
             else:
@@ -262,82 +266,86 @@ class Apu:
         self.animation_timer += self.animation_speed
         if self.animation_timer >= 1:
             self.animation_timer = 0
-            self.frame_index = (self.frame_index + 1) % len(self.frames)
+            self.frame_index = (self.frame_index + 1) % len(self.original_frames)
             self.image = self.original_frames[self.frame_index]
         if self.rect.colliderect(player.rect):
             player.health -= 1
 
-    def take_damage(self, damage):
-        self.health -= damage
-        if self.health <= 0:
-            self.active = False
-            return True
-        return False
-
     def draw(self, screen):
         if not self.active:
             return
+        # Sprite
         screen.blit(self.image, self.rect)
-        health_bar_width = 80
-        health_bar_height = 10
-        health_x = self.rect.x
-        health_y = self.rect.y - 20
-        pygame.draw.rect(screen, RED, (health_x, health_y, health_bar_width, health_bar_height))
-        current_health_width = int((self.health / self.max_health) * health_bar_width)
-        pygame.draw.rect(screen, GREEN, (health_x, health_y, current_health_width, health_bar_height))
-        font = pygame.font.Font(None, 20)
-        name_text = font.render(self.name, True, WHITE)
-        screen.blit(name_text, (self.rect.x, self.rect.y - 35))
+        # Barra de vida
+        pygame.draw.rect(screen, RED, (self.rect.x, self.rect.y - 20, 80, 10))
+        pygame.draw.rect(screen, GREEN, (self.rect.x, self.rect.y - 20,
+                                         int((self.health / self.max_health) * 80), 10))
+        # Nombre
+        text_surface = self.font.render(self.name, True, WHITE)
+        text_rect = text_surface.get_rect(center=(self.rect.centerx, self.rect.top - 25))
+        screen.blit(text_surface, text_rect)
+
 
 class Articulo:
     def __init__(self, name, x, y):
         self.name = name
         self.rect = pygame.Rect(x, y, 20, 20)
         self.collected = False
-        color_map = {
-            "Tumi": YELLOW, "Chacana": PURPLE, "Illa": BLUE, "Torito": RED,
-            "Perro Viringo": (139, 69, 19), "Cuy": (160, 82, 45), "Qullqi": WHITE,
-            "Quispe": (192, 192, 192), "Qori": YELLOW, "Chuño": (75, 0, 130),
-            "Papa": (139, 69, 19), "Maíz": YELLOW, "Calluha": GREEN,
-            "Cungalpo": (255, 140, 0), "Hizanche": (255, 20, 147),
-            "Huashacara": (0, 255, 255), "Inti": (255, 215, 0),
-            "Killa": (211, 211, 211), "Chaska": (255, 255, 255)
-        }
-        self.color = color_map.get(name, WHITE)
+        self.color = (255, 255, 0)
         self.float_timer = 0
         self.base_y = y
+        self.font = pygame.font.SysFont("Arial", 14, bold=True)
 
     def update(self):
         if not self.collected:
             self.float_timer += 0.1
-            self.rect.y = self.base_y + int(5 * math.cos(self.float_timer))  # 👈 USAR math.cos
+            self.rect.y = self.base_y + int(5 * math.cos(self.float_timer))
 
     def draw(self, screen):
         if not self.collected:
             pygame.draw.circle(screen, self.color, self.rect.center, 10)
             pygame.draw.circle(screen, WHITE, self.rect.center, 10, 2)
-            font = pygame.font.Font(None, 16)
-            text = font.render(self.name, True, WHITE)
-            text_rect = text.get_rect(center=(self.rect.centerx, self.rect.y - 15))
-            screen.blit(text, text_rect)
+            # Nombre debajo
+            text_surface = self.font.render(self.name, True, WHITE)
+            text_rect = text_surface.get_rect(center=(self.rect.centerx, self.rect.bottom + 10))
+            screen.blit(text_surface, text_rect)
 
+
+# ================== GAME STATE ==================
 class GameState:
     def __init__(self):
         self.articulos = []
         self.apus = []
+        self.arbol = ArbolJerarquico()
         self.spawn_articulos()
-        self.spawn_apu()
+        self.spawn_apus()
+        self.crear_jerarquia()
 
     def spawn_articulos(self):
-        for i, articulo_name in enumerate(ARTICULOS_DATA):
+        for articulo_name in ARTICULOS_DATA:
             x = random.randint(100, SCREEN_WIDTH - 100)
-            y = SCREEN_HEIGHT - 200 - random.randint(0, 100)
+            y = SCREEN_HEIGHT - 200
             self.articulos.append(Articulo(articulo_name, x, y))
 
-    def spawn_apu(self):
-            huascaran = Apu("Huascarán", SCREEN_WIDTH - 150, SCREEN_HEIGHT - 230, gif_path="-1--unscreen.gif")
-            self.apus.append(huascaran)
+    def spawn_apus(self):
+     for i, apu_name in enumerate(APUS_DATA.keys()):
+        if apu_name == "Coropuna":
+            apu = Apu(apu_name, 100 + i * 150, SCREEN_HEIGHT - 230, gif_path="-1--unscreen.gif")
+        elif apu_name == "Huascarán":
+            apu = Apu(apu_name, 100 + i * 150, SCREEN_HEIGHT - 230, gif_path="-1--unscreen.gif")
+        else:
+            apu = Apu(apu_name, 100 + i * 150, SCREEN_HEIGHT - 230, gif_path="-1--unscreen.gif")
+        self.apus.append(apu)
 
+
+    def crear_jerarquia(self):
+        for apu in self.apus:
+            self.arbol.insertar(apu.name, tipo="apu")
+        for articulo in self.articulos:
+            self.arbol.insertar(articulo.name, tipo="articulo")
+
+        print("📌 Jerarquía del Árbol (Inorden):")
+        self.arbol.mostrar_inorden()
 
     def update(self, player):
         for articulo in self.articulos:
@@ -354,14 +362,13 @@ class GameState:
         for apu in self.apus:
             apu.draw(screen)
 
-
-
+# ================== FONDO ==================
 class AnimatedBackground:
     def __init__(self, gif_path=None):
         if gif_path and os.path.exists(gif_path):
             self.frames = load_gif_frames(gif_path)
             if self.frames:
-                self.frames = [pygame.transform.scale(frame, (SCREEN_WIDTH, SCREEN_HEIGHT)) for frame in self.frames]
+                self.frames = [pygame.transform.scale(f, (SCREEN_WIDTH, SCREEN_HEIGHT)) for f in self.frames]
                 self.current_frame = 0
                 self.animation_speed = 0.1
                 self.animation_timer = 0
@@ -390,7 +397,7 @@ class AnimatedBackground:
         else:
             screen.blit(self.background, (0, 0))
 
-# ------------------ MAIN LOOP ------------------
+# ================== MAIN ==================
 def main():
     # 🌄 Fondo animado (GIF del paisaje)
     background = AnimatedBackground(gif_path="1366_2000.gif")
@@ -432,3 +439,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
