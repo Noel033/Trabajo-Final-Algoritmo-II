@@ -5,93 +5,15 @@ import random
 import math
 from PIL import Image
 
-# ================== ESTRUCTURA DE ÁRBOL BINARIO ==================
-class TreeNode:
-    def __init__(self, data, key=None):
-        self.data = data
-        self.key = key if key is not None else id(data)
-        self.left = None
-        self.right = None
-        self.parent = None
-
-class BinaryTree:
-    def __init__(self):
-        self.root = None
-        self.size = 0
-    
-    def insert(self, data, key=None):
-        """Insertar un nuevo nodo en el árbol"""
-        new_node = TreeNode(data, key)
-        
-        if self.root is None:
-            self.root = new_node
-            self.size += 1
-            return new_node
-        
-        # Buscar posición para insertar
-        current = self.root
-        while True:
-            if new_node.key < current.key:
-                if current.left is None:
-                    current.left = new_node
-                    new_node.parent = current
-                    self.size += 1
-                    return new_node
-                current = current.left
-            else:
-                if current.right is None:
-                    current.right = new_node
-                    new_node.parent = current
-                    self.size += 1
-                    return new_node
-                current = current.right
-    
-    def search(self, key):
-        """Buscar un nodo por su clave"""
-        current = self.root
-        while current is not None:
-            if key == current.key:
-                return current
-            elif key < current.key:
-                current = current.left
-            else:
-                current = current.right
-        return None
-    
-    def inorder_traversal(self, node=None, result=None):
-        """Recorrido inorden del árbol"""
-        if result is None:
-            result = []
-        if node is None:
-            node = self.root
-        
-        if node is not None:
-            self.inorder_traversal(node.left, result)
-            result.append(node.data)
-            self.inorder_traversal(node.right, result)
-        
-        return result
-    
-    def get_all_data(self):
-        """Obtener todos los datos del árbol"""
-        return self.inorder_traversal()
-    
-    def get_by_index(self, index):
-        """Obtener elemento por índice (usando recorrido inorden)"""
-        data_list = self.get_all_data()
-        if 0 <= index < len(data_list):
-            return data_list[index]
-        return None
-
 # ================== PYGAME INICIO ==================
 pygame.init()
-pygame.mixer.init()
+pygame.mixer.init()  # Inicializar el mixer para sonido
 
 # Configuración de pantalla
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("La Travesía de Ekeko - 12 Escenas (Árbol Binario)")
+pygame.display.set_caption("La Travesía de Ekeko - 12 Escenas")
 
 # Colores
 WHITE = (255, 255, 255)
@@ -107,150 +29,182 @@ DARK_GRAY = (64, 64, 64)
 FPS = 60
 clock = pygame.time.Clock()
 
-# ================== DATOS DEL JUEGO CON ÁRBOL BINARIO ==================
-class ApuData:
-    def __init__(self, name, color, health, bioma, gif):
-        self.name = name
-        self.color = color
-        self.health = health
-        self.bioma = bioma
-        self.gif = gif
-        self.id = hash(name)
+# ================== DATOS DEL JUEGO ==================
+APUS_DATA = {
+    "Huascarán": {"color": (255, 255, 255), "health": 100, "bioma": "Montaña Nevada", "gif": "coropuna.gif"},
+    "Misti": {"color": (255, 150, 150), "health": 85, "bioma": "Volcán", "gif": "coropuna.gif"},
+    "Coropuna": {"color": (200, 200, 255), "health": 90, "bioma": "Glaciar", "gif": "coropuna.gif"},
+    "Ampato": {"color": (150, 255, 150), "health": 95, "bioma": "Altiplano", "gif": "ampato.gif"},
+    "Chachani": {"color": (255, 200, 100), "health": 80, "bioma": "Desierto Alto", "gif": "coropuna.gif"},
+    "Sabancaya": {"color": (255, 100, 100), "health": 88, "bioma": "Volcán Activo", "gif": "coropuna.gif"},
+    "Alpamayo": {"color": (200, 255, 255), "health": 92, "bioma": "Pico Nevado", "gif": "coropuna.gif"},
+    "Yerupajá": {"color": (180, 180, 255), "health": 98, "bioma": "Cordillera", "gif": "coropuna.gif"},
+    "Ausangate": {"color": (255, 180, 255), "health": 85, "bioma": "Laguna Sagrada", "gif": "coropuna.gif"},
+    "Salkantay": {"color": (100, 255, 200), "health": 90, "bioma": "Selva Alta", "gif": "coropuna.gif"},
+    "Chopicalqui": {"color": (255, 255, 150), "health": 87, "bioma": "Valle Glaciar", "gif": "coropuna.gif"},
+    "Cotopaxi": {"color": (200, 100, 255), "health": 100, "bioma": "Cima Suprema", "gif": "coropuna.gif"}
+}
 
-class IllaData:
-    def __init__(self, name, gif_path):
-        self.name = name
-        self.gif_path = gif_path
-        self.id = hash(name)
-
-class QuestionData:
-    def __init__(self, apu, pregunta, opciones, respuesta_correcta):
-        self.apu = apu
-        self.pregunta = pregunta
-        self.opciones = opciones
-        self.respuesta_correcta = respuesta_correcta
-        self.id = hash(apu)
-
-class BiomeData:
-    def __init__(self, index, gif_path, music_path):
-        self.index = index
-        self.gif_path = gif_path
-        self.music_path = music_path
-        self.id = index
-
-# Crear árboles binarios para diferentes tipos de datos
-apus_tree = BinaryTree()
-illas_tree = BinaryTree()
-questions_tree = BinaryTree()
-biomes_tree = BinaryTree()
-scene_illas_tree = BinaryTree()
-
-# Insertar datos de Apus en el árbol
-apus_data = [
-    ("Huascarán", (255, 255, 255), 100, "Montaña Nevada", "coropuna.gif"),
-    ("Misti", (255, 150, 150), 85, "Volcán", "coropuna.gif"),
-    ("Coropuna", (200, 200, 255), 90, "Glaciar", "coropuna.gif"),
-    ("Ampato", (150, 255, 150), 95, "Altiplano", "ampato.gif"),
-    ("Chachani", (255, 200, 100), 80, "Desierto Alto", "coropuna.gif"),
-    ("Sabancaya", (255, 100, 100), 88, "Volcán Activo", "coropuna.gif"),
-    ("Alpamayo", (200, 255, 255), 92, "Pico Nevado", "coropuna.gif"),
-    ("Yerupajá", (180, 180, 255), 98, "Cordillera", "coropuna.gif"),
-    ("Ausangate", (255, 180, 255), 85, "Laguna Sagrada", "coropuna.gif"),
-    ("Salkantay", (100, 255, 200), 90, "Selva Alta", "coropuna.gif"),
-    ("Chopicalqui", (255, 255, 150), 87, "Valle Glaciar", "coropuna.gif"),
-    ("Cotopaxi", (200, 100, 255), 100, "Cima Suprema", "coropuna.gif")
+# GIFs de fondo para cada escena/bioma
+BIOMA_GIFS = [
+    "primerBio.gif",                 # Huascarán - AQUÍ PUEDES CAMBIAR POR TU GIF
+    "segundoBio.gif",                  # Misti - AQUÍ PUEDES CAMBIAR POR TU GIF
+    "bioma3_glaciar.gif",             # Coropuna
+    "bioma4_altiplano.gif",           # Ampato
+    "bioma5_desierto_alto.gif",       # Chachani
+    "bioma6_volcan_activo.gif",       # Sabancaya
+    "bioma7_pico_nevado.gif",         # Alpamayo
+    "bioma8_cordillera.gif",          # Yerupajá
+    "bioma9_laguna_sagrada.gif",      # Ausangate
+    "bioma10_selva_alta.gif",         # Salkantay
+    "bioma11_valle_glaciar.gif",      # Chopicalqui
+    "bioma12_cima_suprema.gif"        # Cotopaxi
 ]
 
-for i, (name, color, health, bioma, gif) in enumerate(apus_data):
-    apu_data = ApuData(name, color, health, bioma, gif)
-    apus_tree.insert(apu_data, i)
-
-# Insertar datos de Illas en el árbol
-illas_data = [
-    ("Tumi", "tumi.gif"), ("Chacana", "chacana.gif"), ("Illa", "illa.gif"),
-    ("Torito", "torito.gif"), ("Perro Viringo", "perro_viringo.gif"),
-    ("Cuy", "cuy.gif"), ("Qullqi", "qullqi.gif"), ("Quispe", "quispe.gif"),
-    ("Qori", "qori.gif"), ("Chuño", "chuno.gif"), ("Papa", "papa.gif"),
-    ("Maíz", "maiz.gif"), ("Calluha", "calluha.gif"), ("Cungalpo", "cungalpo.gif"),
-    ("Hizanche", "hizanche.gif"), ("Huashacara", "huashacara.gif"),
-    ("Inti", "inti.gif"), ("Killa", "killa.gif"), ("Chaska", "chaska.gif")
+# Música para cada bioma (puedes agregar archivos .mp3 o .ogg)
+BIOMA_MUSIC = [
+    "musica1.mp3",          # Huascarán - AQUÍ PONES TU MÚSICA
+    "musica_2.mp3",              # Misti - AQUÍ PONES TU MÚSICA
+    "musica3_coropuna.mp3",           # Coropuna
+    "musica4_ampato.mp3",             # Ampato
+    "musica5_chachani.mp3",           # Chachani
+    "musica6_sabancaya.mp3",          # Sabancaya
+    "musica7_alpamayo.mp3",           # Alpamayo
+    "musica8_yerupaja.mp3",           # Yerupajá
+    "musica9_ausangate.mp3",          # Ausangate
+    "musica10_salkantay.mp3",         # Salkantay
+    "musica11_chopicalqui.mp3",       # Chopicalqui
+    "musica12_cotopaxi.mp3"           # Cotopaxi
 ]
 
-for i, (name, gif_path) in enumerate(illas_data):
-    illa_data = IllaData(name, gif_path)
-    illas_tree.insert(illa_data, i)
-
-# Insertar datos de biomas en el árbol
-biomes_data = [
-    ("primerBio.gif", "musica1.mp3"), ("segundoBio.gif", "musica_2.mp3"),
-    ("bioma3_glaciar.gif", "musica3_coropuna.mp3"), ("bioma4_altiplano.gif", "musica4_ampato.mp3"),
-    ("bioma5_desierto_alto.gif", "musica5_chachani.mp3"), ("bioma6_volcan_activo.gif", "musica6_sabancaya.mp3"),
-    ("bioma7_pico_nevado.gif", "musica7_alpamayo.mp3"), ("bioma8_cordillera.gif", "musica8_yerupaja.mp3"),
-    ("bioma9_laguna_sagrada.gif", "musica9_ausangate.mp3"), ("bioma10_selva_alta.gif", "musica10_salkantay.mp3"),
-    ("bioma11_valle_glaciar.gif", "musica11_chopicalqui.mp3"), ("bioma12_cima_suprema.gif", "musica12_cotopaxi.mp3")
+# Illas robadas divididas entre los 12 Apus (19 artículos total)
+ILLAS_ROBADAS_POR_ESCENA = [
+    # Escena 1 - Huascarán (2 illas)
+    ["Tumi", "Chacana"],
+    # Escena 2 - Misti (2 illas)  
+    ["Illa", "Torito"],
+    # Escena 3 - Coropuna (2 illas)
+    ["Perro Viringo", "Cuy"],
+    # Escena 4 - Ampato (2 illas)
+    ["Qullqi", "Quispe"],
+    # Escena 5 - Chachani (2 illas)
+    ["Qori", "Chuño"],
+    # Escena 6 - Sabancaya (2 illas)
+    ["Papa", "Maíz"],
+    # Escena 7 - Alpamayo (1 illa)
+    ["Calluha"],
+    # Escena 8 - Yerupajá (1 illa)
+    ["Cungalpo"],
+    # Escena 9 - Ausangate (1 illa)
+    ["Hizanche"],
+    # Escena 10 - Salkantay (1 illa)
+    ["Huashacara"],
+    # Escena 11 - Chopicalqui (1 illa)
+    ["Inti"],
+    # Escena 12 - Cotopaxi (2 illas restantes)
+    ["Killa", "Chaska"]
 ]
 
-for i, (gif_path, music_path) in enumerate(biomes_data):
-    biome_data = BiomeData(i, gif_path, music_path)
-    biomes_tree.insert(biome_data, i)
+# GIFs para cada illa robada
+ILLAS_GIFS = {
+    "Tumi": "tumi.gif",
+    "Chacana": "chacana.gif", 
+    "Illa": "illa.gif",
+    "Torito": "torito.gif",
+    "Perro Viringo": "perro_viringo.gif",
+    "Cuy": "cuy.gif",
+    "Qullqi": "qullqi.gif",
+    "Quispe": "quispe.gif",
+    "Qori": "qori.gif",
+    "Chuño": "chuno.gif",
+    "Papa": "papa.gif",
+    "Maíz": "maiz.gif",
+    "Calluha": "calluha.gif",
+    "Cungalpo": "cungalpo.gif",
+    "Hizanche": "hizanche.gif",
+    "Huashacara": "huashacara.gif",
+    "Inti": "inti.gif",
+    "Killa": "killa.gif",
+    "Chaska": "chaska.gif"
+}
 
-# Insertar distribución de illas por escena en el árbol
-scene_illas_data = [
-    (0, ["Tumi", "Chacana"]), (1, ["Illa", "Torito"]),
-    (2, ["Perro Viringo", "Cuy"]), (3, ["Qullqi", "Quispe"]),
-    (4, ["Qori", "Chuño"]), (5, ["Papa", "Maíz"]),
-    (6, ["Calluha"]), (7, ["Cungalpo"]),
-    (8, ["Hizanche"]), (9, ["Huashacara"]),
-    (10, ["Inti"]), (11, ["Killa", "Chaska"])
+# Preguntas para cada Apu
+PREGUNTAS_APUS = [
+    {
+        "apu": "Huascarán",
+        "pregunta": "¿Qué civilización es conocida por sus impresionantes líneas trazadas en el desierto que solo pueden verse desde el aire?",
+        "opciones": ["Mochica", "Nazca", "Chavín", "Wari"],
+        "respuesta_correcta": 1
+    },
+    {
+        "apu": "Misti",
+        "pregunta": "¿Cuál fue la capital del Imperio Inca?",
+        "opciones": ["Cusco", "Machu Picchu", "Ollantaytambo", "Sacsayhuamán"],
+        "respuesta_correcta": 0
+    },
+    {
+        "apu": "Coropuna",
+        "pregunta": "¿Qué cultura es famosa por sus huacos retratos y su avanzada metalurgia?",
+        "opciones": ["Nazca", "Chavín", "Mochica", "Chimú"],
+        "respuesta_correcta": 2
+    },
+    {
+        "apu": "Ampato",
+        "pregunta": "¿Cuál es el nombre del sistema de nudos usado por los incas para registrar información?",
+        "opciones": ["Quipu", "Tocapu", "Ayllu", "Mit'a"],
+        "respuesta_correcta": 0
+    },
+    {
+        "apu": "Chachani",
+        "pregunta": "¿Qué cultura construyó el famoso templo de Chavín de Huántar?",
+        "opciones": ["Wari", "Tiahuanaco", "Chavín", "Paracas"],
+        "respuesta_correcta": 2
+    },
+    {
+        "apu": "Sabancaya",
+        "pregunta": "¿Cómo se llamaba el emperador inca cuando llegaron los españoles?",
+        "opciones": ["Huáscar", "Atahualpa", "Manco Inca", "Túpac Amaru"],
+        "respuesta_correcta": 1
+    },
+    {
+        "apu": "Alpamayo",
+        "pregunta": "¿Qué cultura creó los famosos mantos de Paracas?",
+        "opciones": ["Paracas", "Nazca", "Ica", "Chincha"],
+        "respuesta_correcta": 0
+    },
+    {
+        "apu": "Yerupajá",
+        "pregunta": "¿Cuál era la moneda de intercambio principal en el Imperio Inca?",
+        "opciones": ["Oro", "Plata", "No usaban moneda", "Cobre"],
+        "respuesta_correcta": 2
+    },
+    {
+        "apu": "Ausangate",
+        "pregunta": "¿Qué significa 'Tahuantinsuyu'?",
+        "opciones": ["Casa del Sol", "Cuatro regiones", "Gran Imperio", "Tierra Sagrada"],
+        "respuesta_correcta": 1
+    },
+    {
+        "apu": "Salkantay",
+        "pregunta": "¿Qué cultura desarrolló la técnica agrícola de andenes o terrazas?",
+        "opciones": ["Nazca", "Inca", "Wari", "Todas las anteriores"],
+        "respuesta_correcta": 3
+    },
+    {
+        "apu": "Chopicalqui",
+        "pregunta": "¿Cómo se llamaba el dios principal de los incas?",
+        "opciones": ["Viracocha", "Inti", "Mama Quilla", "Pachacamac"],
+        "respuesta_correcta": 1
+    },
+    {
+        "apu": "Cotopaxi",
+        "pregunta": "¿Cuál fue la primera capital de los incas antes de Cusco?",
+        "opciones": ["Paqariq Tampu", "Ollantaytambo", "Pisaq", "Machu Picchu"],
+        "respuesta_correcta": 0
+    }
 ]
 
-for scene_index, illas_list in scene_illas_data:
-    scene_illas_tree.insert(illas_list, scene_index)
-
-# Insertar preguntas en el árbol
-questions_data = [
-    ("Huascarán", "¿Qué civilización es conocida por sus impresionantes líneas trazadas en el desierto que solo pueden verse desde el aire?", ["Mochica", "Nazca", "Chavín", "Wari"], 1),
-    ("Misti", "¿Cuál fue la capital del Imperio Inca?", ["Cusco", "Machu Picchu", "Ollantaytambo", "Sacsayhuamán"], 0),
-    ("Coropuna", "¿Qué cultura es famosa por sus huacos retratos y su avanzada metalurgia?", ["Nazca", "Chavín", "Mochica", "Chimú"], 2),
-    ("Ampato", "¿Cuál es el nombre del sistema de nudos usado por los incas para registrar información?", ["Quipu", "Tocapu", "Ayllu", "Mit'a"], 0),
-    ("Chachani", "¿Qué cultura construyó el famoso templo de Chavín de Huántar?", ["Wari", "Tiahuanaco", "Chavín", "Paracas"], 2),
-    ("Sabancaya", "¿Cómo se llamaba el emperador inca cuando llegaron los españoles?", ["Huáscar", "Atahualpa", "Manco Inca", "Túpac Amaru"], 1),
-    ("Alpamayo", "¿Qué cultura creó los famosos mantos de Paracas?", ["Paracas", "Nazca", "Ica", "Chincha"], 0),
-    ("Yerupajá", "¿Cuál era la moneda de intercambio principal en el Imperio Inca?", ["Oro", "Plata", "No usaban moneda", "Cobre"], 2),
-    ("Ausangate", "¿Qué significa 'Tahuantinsuyu'?", ["Casa del Sol", "Cuatro regiones", "Gran Imperio", "Tierra Sagrada"], 1),
-    ("Salkantay", "¿Qué cultura desarrolló la técnica agrícola de andenes o terrazas?", ["Nazca", "Inca", "Wari", "Todas las anteriores"], 3),
-    ("Chopicalqui", "¿Cómo se llamaba el dios principal de los incas?", ["Viracocha", "Inti", "Mama Quilla", "Pachacamac"], 1),
-    ("Cotopaxi", "¿Cuál fue la primera capital de los incas antes de Cusco?", ["Paqariq Tampu", "Ollantaytambo", "Pisaq", "Machu Picchu"], 0)
-]
-
-for i, (apu, pregunta, opciones, respuesta) in enumerate(questions_data):
-    question_data = QuestionData(apu, pregunta, opciones, respuesta)
-    questions_tree.insert(question_data, i)
-
-# ================== FUNCIONES AUXILIARES ==================
-def get_apu_data(index):
-    """Obtener datos de Apu por índice usando árbol binario"""
-    return apus_tree.get_by_index(index)
-
-def get_illa_data_by_name(name):
-    """Buscar illa por nombre en el árbol"""
-    for illa in illas_tree.get_all_data():
-        if illa.name == name:
-            return illa
-    return None
-
-def get_biome_data(index):
-    """Obtener datos de bioma por índice"""
-    return biomes_tree.get_by_index(index)
-
-def get_question_data(index):
-    """Obtener datos de pregunta por índice"""
-    return questions_tree.get_by_index(index)
-
-def get_scene_illas(scene_index):
-    """Obtener illas de una escena específica"""
-    return scene_illas_tree.get_by_index(scene_index)
-
+# ================== FUNCIONES ==================
 def load_gif_frames(gif_path):
     """Carga todos los frames de un GIF como superficies pygame"""
     try:
@@ -283,7 +237,7 @@ def play_music(music_path, loop=-1):
     """Reproduce música de fondo"""
     try:
         if load_music(music_path):
-            pygame.mixer.music.play(loop)
+            pygame.mixer.music.play(loop)  # -1 = loop infinito
             return True
         return False
     except Exception as e:
@@ -315,7 +269,7 @@ def draw_pixelated_hearts(screen, lives, max_lives, x, y):
         pygame.draw.rect(screen, color, (heart_x + 4, heart_y + 10, 12, 4))
         pygame.draw.rect(screen, color, (heart_x + 6, heart_y + 14, 8, 4))
         pygame.draw.rect(screen, color, (heart_x + 8, heart_y + 18, 4, 4))
-
+        
 # ================== MENÚ PRINCIPAL ==================
 class MainMenu:
     def __init__(self):
@@ -325,8 +279,9 @@ class MainMenu:
         self.font_subtitle = pygame.font.SysFont("Arial", 24, bold=True)
         self.font_options = pygame.font.SysFont("Arial", 32, bold=True)
         
+        # Cargar fondo del menú - AQUÍ PONES TU IMAGEN DE FONDO
         self.background_frames = None
-        menu_bg_path = "menu_background.gif"
+        menu_bg_path = "menu_background.gif"  # CAMBIA ESTE NOMBRE POR TU GIF DE FONDO
         if os.path.exists(menu_bg_path):
             self.background_frames = load_gif_frames(menu_bg_path)
             if self.background_frames:
@@ -335,10 +290,12 @@ class MainMenu:
                 self.animation_timer = 0
                 self.animation_speed = 0.1
         
+        # Si no hay GIF, crear fondo estático
         if not self.background_frames:
             self.create_static_background()
         
-        self.menu_music_path = "menu_music.mp3"
+        # Cargar y reproducir música del menú - AQUÍ PONES TU MÚSICA
+        self.menu_music_path = "menu_music.mp3"  # CAMBIA ESTE NOMBRE POR TU MÚSICA
         if os.path.exists(self.menu_music_path):
             play_music(self.menu_music_path)
             print(f"🎵 Reproduciendo música del menú: {self.menu_music_path}")
@@ -348,6 +305,7 @@ class MainMenu:
     def create_static_background(self):
         """Crear fondo estático si no hay GIF"""
         self.static_background = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        # Degradado de cielo
         for y in range(SCREEN_HEIGHT):
             color_ratio = y / SCREEN_HEIGHT
             r = int(135 + (255 - 135) * color_ratio)
@@ -355,6 +313,7 @@ class MainMenu:
             b = int(250 + (255 - 250) * color_ratio)
             pygame.draw.line(self.static_background, (r, g, b), (0, y), (SCREEN_WIDTH, y))
         
+        # Suelo verde
         pygame.draw.rect(self.static_background, (34, 139, 34), (0, SCREEN_HEIGHT - 150, SCREEN_WIDTH, 150))
 
     def handle_input(self, event):
@@ -375,11 +334,13 @@ class MainMenu:
                 self.current_frame = (self.current_frame + 1) % len(self.background_frames)
 
     def draw(self, screen):
+        # Dibujar fondo
         if self.background_frames:
             screen.blit(self.background_frames[self.current_frame], (0, 0))
         else:
             screen.blit(self.static_background, (0, 0))
         
+        # Título principal
         title_text = self.font_title.render("LA TRAVESÍA DE EKEKO", True, WHITE)
         title_shadow = self.font_title.render("LA TRAVESÍA DE EKEKO", True, BLACK)
         title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, 150))
@@ -387,10 +348,12 @@ class MainMenu:
         screen.blit(title_shadow, shadow_rect)
         screen.blit(title_text, title_rect)
         
+        # Subtítulo
         subtitle_text = self.font_subtitle.render("Rescata las 19 Illas Sagradas de los 12 Apus", True, YELLOW)
         subtitle_rect = subtitle_text.get_rect(center=(SCREEN_WIDTH // 2, 200))
         screen.blit(subtitle_text, subtitle_rect)
         
+        # Opciones del menú
         start_y = 300
         for i, option in enumerate(self.options):
             color = YELLOW if i == self.selected_option else WHITE
@@ -405,9 +368,11 @@ class MainMenu:
             screen.blit(shadow_surface, shadow_rect)
             screen.blit(text_surface, text_rect)
         
+        # Instrucciones de navegación
         nav_text = pygame.font.SysFont("Arial", 16).render("Usa ↑↓ para navegar, ENTER para seleccionar", True, WHITE)
         nav_rect = nav_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 50))
         screen.blit(nav_text, nav_rect)
+
 
 # ================== PANTALLA DE INSTRUCCIONES ==================
 class InstructionsScreen:
@@ -422,15 +387,18 @@ class InstructionsScreen:
         return None
     
     def draw(self, screen):
+        # Fondo semi-transparente
         overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
         overlay.set_alpha(200)
         overlay.fill(BLACK)
         screen.blit(overlay, (0, 0))
         
+        # Título
         title_text = self.font_title.render("INSTRUCCIONES", True, WHITE)
         title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, 80))
         screen.blit(title_text, title_rect)
         
+        # Instrucciones
         instructions = [
             "🎯 OBJETIVO:",
             "Ayuda a Ekeko a recuperar las 19 Illas Sagradas robadas por los 12 Apus",
@@ -452,18 +420,14 @@ class InstructionsScreen:
             "• Respuesta incorrecta = Pierdes vida + pregunta de nuevo",
             "• Completa las 12 escenas para ganar",
             "",
-            "🌳 ESTRUCTURA DE DATOS:",
-            "• El juego usa árboles binarios para organizar los datos",
-            "• Apus, illas, preguntas y biomas están en árboles separados",
-            "",
             "Presiona ESC o ENTER para volver al menú"
         ]
         
-        y_offset = 120
+        y_offset = 140
         for line in instructions:
-            if line.startswith("🎯") or line.startswith("🕹️") or line.startswith("❤️") or line.startswith("🏔️") or line.startswith("🌳"):
+            if line.startswith("🎯") or line.startswith("🕹️") or line.startswith("❤️") or line.startswith("🏔️"):
                 color = YELLOW
-                font = pygame.font.SysFont("Arial", 18, bold=True)
+                font = pygame.font.SysFont("Arial", 20, bold=True)
             elif line.startswith("•"):
                 color = WHITE
                 font = self.font_text
@@ -476,7 +440,8 @@ class InstructionsScreen:
                 text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, y_offset))
                 screen.blit(text_surface, text_rect)
             
-            y_offset += 22
+            y_offset += 25
+
 
 # ================== CLASES DEL JUEGO ==================
 class Player:
@@ -509,11 +474,11 @@ class Player:
         self.animation_speed = 0.2
         self.animation_timer = 0
         
+        # Sistema de vidas
         self.lives = 3
         self.max_lives = 3
         
-        # Usar árbol binario para artículos recolectados
-        self.articulos_tree = BinaryTree()
+        self.articulos_collected = []
         self.font = pygame.font.SysFont("Arial", 18, bold=True)
 
     def create_placeholder(self):
@@ -581,22 +546,10 @@ class Player:
         return False
 
     def collect_articulos(self, articulos_list):
-        """Recolectar artículos usando árbol binario"""
         for articulo in articulos_list:
-            # Verificar si ya está recolectado
-            already_collected = False
-            for collected in self.articulos_tree.get_all_data():
-                if collected == articulo:
-                    already_collected = True
-                    break
-            
-            if not already_collected:
-                self.articulos_tree.insert(articulo, hash(articulo))
+            if articulo not in self.articulos_collected:
+                self.articulos_collected.append(articulo)
                 print(f"🎒 Ekeko recolectó: {articulo}")
-
-    def get_collected_count(self):
-        """Obtener número de artículos recolectados"""
-        return self.articulos_tree.size
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
@@ -608,44 +561,39 @@ class Player:
 class Apu:
     def __init__(self, name, x, y, scene_number=0):
         self.name = name
+        self.data = APUS_DATA[name]
+        self.size = 80
+        self.health = self.data["health"]
+        self.max_health = self.data["health"]
         self.scene_number = scene_number
-        
-        # Obtener datos del Apu desde el árbol binario
-        apu_data = get_apu_data(scene_number)
-        if apu_data:
-            self.data = apu_data
-            self.size = 80
-            self.health = apu_data.health
-            self.max_health = apu_data.health
 
-            apu_gif_path = apu_data.gif
-            self.frames = None
-            if apu_gif_path and os.path.exists(apu_gif_path):
-                self.frames = load_gif_frames(apu_gif_path)
-            if self.frames:
-                self.frames = [pygame.transform.scale(f, (self.size, self.size)) for f in self.frames]
-                self.image = self.frames[0]
-                self.original_frames = self.frames[:]
-            else:
-                self.image = pygame.Surface((self.size, self.size))
-                self.image.fill(apu_data.color)
-                self.original_frames = [self.image]
+        apu_gif_path = self.data["gif"]
+        self.frames = None
+        if apu_gif_path and os.path.exists(apu_gif_path):
+            self.frames = load_gif_frames(apu_gif_path)
+        if self.frames:
+            self.frames = [pygame.transform.scale(f, (self.size, self.size)) for f in self.frames]
+            self.image = self.frames[0]
+            self.original_frames = self.frames[:]
+        else:
+            self.image = pygame.Surface((self.size, self.size))
+            self.image.fill(self.data["color"])
+            self.original_frames = [self.image]
 
-            self.rect = self.image.get_rect()
-            self.rect.x = x
-            self.rect.y = y
-            self.frame_index = 0
-            self.animation_timer = 0
-            self.animation_speed = 0.15
-            self.font = pygame.font.SysFont("Arial", 18, bold=True)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.frame_index = 0
+        self.animation_timer = 0
+        self.animation_speed = 0.15
+        self.font = pygame.font.SysFont("Arial", 18, bold=True)
 
     def update(self):
-        if hasattr(self, 'original_frames'):
-            self.animation_timer += self.animation_speed
-            if self.animation_timer >= 1:
-                self.animation_timer = 0
-                self.frame_index = (self.frame_index + 1) % len(self.original_frames)
-                self.image = self.original_frames[self.frame_index]
+        self.animation_timer += self.animation_speed
+        if self.animation_timer >= 1:
+            self.animation_timer = 0
+            self.frame_index = (self.frame_index + 1) % len(self.original_frames)
+            self.image = self.original_frames[self.frame_index]
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
@@ -654,17 +602,17 @@ class Apu:
         screen.blit(text_surface, text_rect)
 
     def give_illas_to_player(self, player, scene_number):
-        """El Apu entrega las illas robadas al Ekeko usando árbol binario"""
-        illas = get_scene_illas(scene_number)
-        if illas:
-            message = f"🎁 Apu {self.name} te entrega las illas sagradas: "
-            
-            player.collect_articulos(illas)
-            message += f"{', '.join(illas)}"
-            message += " ¡Guárdalas en tu bolsillo!"
-            print(message)
-            return illas
-        return []
+        """El Apu entrega las illas robadas al Ekeko"""
+        illas = ILLAS_ROBADAS_POR_ESCENA[scene_number]
+        message = f"🎁 Apu {self.name} te entrega las illas sagradas: "
+        
+        for illa in illas:
+            player.collect_articulos([illa])
+            message += f"{illa}, "
+        
+        message = message.rstrip(", ") + " ¡Guárdalas en tu bolsillo!"
+        print(message)
+        return illas
 
 
 class Door:
@@ -714,12 +662,12 @@ class Articulo:
         self.animation_timer = 0
         self.animation_speed = 0.1
         
-        # Buscar datos de la illa en el árbol binario
-        illa_data = get_illa_data_by_name(name)
-        if illa_data and os.path.exists(illa_data.gif_path):
-            self.frames = load_gif_frames(illa_data.gif_path)
-            if self.frames:
-                self.frames = [pygame.transform.scale(f, (25, 25)) for f in self.frames]
+        if name in ILLAS_GIFS:
+            gif_path = ILLAS_GIFS[name]
+            if os.path.exists(gif_path):
+                self.frames = load_gif_frames(gif_path)
+                if self.frames:
+                    self.frames = [pygame.transform.scale(f, (25, 25)) for f in self.frames]
 
     def update(self):
         if not self.collected:
@@ -744,19 +692,12 @@ class Articulo:
             text_surface = self.font.render(self.name, True, WHITE)
             text_rect = text_surface.get_rect(center=(self.rect.centerx, self.rect.bottom + 12))
             screen.blit(text_surface, text_rect)
-
+            
+# ================== PARTE 3 - GAME MANAGER Y SISTEMA PRINCIPAL ==================
 
 class QuestionScreen:
-    def __init__(self, scene_number):
-        # Obtener datos de pregunta desde árbol binario
-        question_data = get_question_data(scene_number)
-        self.pregunta_data = {
-            "apu": question_data.apu,
-            "pregunta": question_data.pregunta,
-            "opciones": question_data.opciones,
-            "respuesta_correcta": question_data.respuesta_correcta
-        }
-        
+    def __init__(self, pregunta_data):
+        self.pregunta_data = pregunta_data
         self.font_title = pygame.font.SysFont("Arial", 24, bold=True)
         self.font_question = pygame.font.SysFont("Arial", 18)
         self.font_options = pygame.font.SysFont("Arial", 16)
@@ -862,11 +803,7 @@ class QuestionScreen:
 class GameScene:
     def __init__(self, scene_number):
         self.scene_number = scene_number
-        
-        # Obtener datos del Apu desde árbol binario
-        apu_data = get_apu_data(scene_number)
-        self.apu_name = apu_data.name if apu_data else f"Apu_{scene_number}"
-        
+        self.apu_name = list(APUS_DATA.keys())[scene_number]
         self.apu = Apu(self.apu_name, SCREEN_WIDTH // 2 - 40, SCREEN_HEIGHT - 230, scene_number)
         self.door = Door(SCREEN_WIDTH - 100, SCREEN_HEIGHT - 250)
         self.question_screen = None
@@ -876,23 +813,22 @@ class GameScene:
         self.illas_message = ""
         self.illas_message_timer = 0
         
-        # Crear artículos visuales usando árbol binario
+        # Crear artículos visibles que flotan en la escena
         self.artikulos_visuales = []
         self.create_visual_artikulos()
 
     def create_visual_artikulos(self):
         """Crear artículos visuales que aparecerán después de responder correctamente"""
-        illas_de_esta_escena = get_scene_illas(self.scene_number)
-        if illas_de_esta_escena:
-            x_start = 150
-            spacing = 100
-            
-            for i, illa_name in enumerate(illas_de_esta_escena):
-                x = x_start + (i * spacing)
-                y = SCREEN_HEIGHT - 250
-                articulo = Articulo(illa_name, x, y)
-                articulo.collected = True  # Empiezan como "recolectados" (invisibles)
-                self.artikulos_visuales.append(articulo)
+        illas_de_esta_escena = ILLAS_ROBADAS_POR_ESCENA[self.scene_number]
+        x_start = 150
+        spacing = 100
+        
+        for i, illa_name in enumerate(illas_de_esta_escena):
+            x = x_start + (i * spacing)
+            y = SCREEN_HEIGHT - 250
+            articulo = Articulo(illa_name, x, y)
+            articulo.collected = True  # Empiezan como "recolectados" (invisibles)
+            self.artikulos_visuales.append(articulo)
 
     def show_artikulos(self):
         """Hacer visibles los artículos cuando el Apu los entrega"""
@@ -904,7 +840,7 @@ class GameScene:
 
     def start_question(self):
         if not self.showing_question and not self.completed:
-            self.question_screen = QuestionScreen(self.scene_number)
+            self.question_screen = QuestionScreen(PREGUNTAS_APUS[self.scene_number])
             self.showing_question = True
 
     def handle_event(self, event, player):
@@ -919,16 +855,15 @@ class GameScene:
                     
                     # El Apu entrega las illas robadas
                     illas_received = self.apu.give_illas_to_player(player, self.scene_number)
-                    if illas_received:
-                        self.illas_message = f"¡Recibiste: {', '.join(illas_received)}!"
-                        self.illas_message_timer = 300
-                        
-                        # Mostrar artículos visuales flotando
-                        self.show_artikulos()
+                    self.illas_message = f"¡Recibiste: {', '.join(illas_received)}!"
+                    self.illas_message_timer = 300
+                    
+                    # Mostrar artículos visuales flotando
+                    self.show_artikulos()
                     
                 else:
                     if player.lose_life():
-                        self.question_screen = QuestionScreen(self.scene_number)
+                        self.question_screen = QuestionScreen(PREGUNTAS_APUS[self.scene_number])
                     else:
                         return "GAME_OVER"
                 
@@ -963,17 +898,12 @@ class GameScene:
 
     def draw(self, screen, player):
         font = pygame.font.SysFont("Arial", 20, bold=True)
-        
-        # Obtener datos del bioma desde árbol binario
-        apu_data = get_apu_data(self.scene_number)
-        bioma_name = apu_data.bioma if apu_data else "Bioma Desconocido"
-        
-        scene_text = font.render(f"Escena {self.scene_number + 1}/12 - {bioma_name}", True, WHITE)
+        scene_text = font.render(f"Escena {self.scene_number + 1}/12 - {APUS_DATA[self.apu_name]['bioma']}", True, WHITE)
         screen.blit(scene_text, (10, 10))
         
         draw_pixelated_hearts(screen, player.lives, player.max_lives, 10, 40)
         
-        illas_text = font.render(f"Illas Recuperadas: {player.get_collected_count()}/19", True, WHITE)
+        illas_text = font.render(f"Illas Recuperadas: {len(player.articulos_collected)}/19", True, WHITE)
         screen.blit(illas_text, (10, 80))
         
         if self.illas_message_timer > 0:
@@ -1010,9 +940,7 @@ class AnimatedBackground:
     def __init__(self, scene_number=0):
         self.scene_number = scene_number
         
-        # Obtener datos del bioma desde árbol binario
-        biome_data = get_biome_data(scene_number)
-        bioma_gif_path = biome_data.gif_path if biome_data else None
+        bioma_gif_path = BIOMA_GIFS[scene_number] if scene_number < len(BIOMA_GIFS) else None
         
         if bioma_gif_path and os.path.exists(bioma_gif_path):
             self.frames = load_gif_frames(bioma_gif_path)
@@ -1081,40 +1009,41 @@ class GameManager:
         self.scenes = []
         self.player = Player(100, SCREEN_HEIGHT - 250, gif_path="gif.gif", scale_factor=0.1)
         self.background = AnimatedBackground(scene_number=0)
-        self.game_state = "MENU"
+        self.game_state = "MENU"  # 👉 empieza en menú
         self.font_big = pygame.font.SysFont("Arial", 36, bold=True)
         self.font_medium = pygame.font.SysFont("Arial", 24, bold=True)
 
-        # Menú principal
+        # ✅ Menú principal
         self.main_menu = MainMenu()
-        self.instructions_screen = InstructionsScreen()
 
-        # Crear escenas usando árbol binario
+        # ✅ Escenas
         for i in range(self.total_scenes):
             self.scenes.append(GameScene(i))
 
-        # Música
+        # ✅ Música
         self.current_music = None
-        self.load_menu_music()
+        self.load_menu_music()  # 🎵 suena música del menú apenas inicia
 
+
+
+    # 🔽 LO NUEVO QUE DEBES AGREGAR AQUÍ
     def load_menu_music(self):
-        menu_music_path = "inicio.mp3"
+        menu_music_path = "inicio.mp3"  # 🎵 pon aquí tu archivo del menú
         if os.path.exists(menu_music_path) and menu_music_path != self.current_music:
-            stop_music()
-            play_music(menu_music_path)
-            self.current_music = menu_music_path
-            print("🎵 Música del MENÚ principal cargada")
+         stop_music()
+         play_music(menu_music_path)
+         self.current_music = menu_music_path
+         print("🎵 Música del MENÚ principal cargada")
+
 
     def load_biome_music(self, scene_number):
-        # Obtener música desde árbol binario
-        biome_data = get_biome_data(scene_number)
-        if biome_data:
-            music_path = biome_data.music_path
-            if os.path.exists(music_path) and music_path != self.current_music:
-                stop_music()
-                play_music(music_path)
-                self.current_music = music_path
-                print(f"🎵 Música del bioma {scene_number+1}: {music_path}")
+     if scene_number < len(BIOMA_MUSIC):
+        music_path = BIOMA_MUSIC[scene_number]
+        if os.path.exists(music_path) and music_path != self.current_music:
+            stop_music()
+            play_music(music_path)
+            self.current_music = music_path
+            print(f"🎵 Música del bioma {scene_number+1}: {music_path}")
 
     def handle_event(self, event):
         if self.game_state == "MENU":
@@ -1146,7 +1075,9 @@ class GameManager:
                 elif event.key == pygame.K_m:
                     stop_music()
                     self.game_state = "MENU"
-                    self.load_menu_music()
+                    if hasattr(self, 'main_menu') and hasattr(self.main_menu, 'menu_music_path'):
+                        if os.path.exists(self.main_menu.menu_music_path):
+                            play_music(self.main_menu.menu_music_path)
         
         return "CONTINUE"
 
@@ -1166,15 +1097,18 @@ class GameManager:
             self.background.update()
 
     def advance_to_next_scene(self):
-        if self.current_scene < self.total_scenes - 1:
-            self.current_scene += 1
-            self.player.rect.x = 100
-            self.player.rect.y = SCREEN_HEIGHT - 250
-            self.background = AnimatedBackground(scene_number=self.current_scene)
-            self.load_biome_music(self.current_scene)
-        else:
-            self.game_state = "VICTORY"
-            stop_music()
+     if self.current_scene < self.total_scenes - 1:
+        self.current_scene += 1
+        self.player.rect.x = 100
+        self.player.rect.y = SCREEN_HEIGHT - 250
+        self.background = AnimatedBackground(scene_number=self.current_scene)
+
+        self.load_biome_music(self.current_scene)  # 🎵 cambia música
+     else:
+        self.game_state = "VICTORY"
+        stop_music()
+
+
 
     def restart_game(self):
         self.current_scene = 0
@@ -1218,7 +1152,7 @@ class GameManager:
             score_rect = score_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 20))
             screen.blit(score_text, score_rect)
             
-            articles_text = self.font_medium.render(f"Illas recuperadas: {self.player.get_collected_count()}/19", True, WHITE)
+            articles_text = self.font_medium.render(f"Illas recuperadas: {len(self.player.articulos_collected)}/19", True, WHITE)
             articles_rect = articles_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 10))
             screen.blit(articles_text, articles_rect)
             
@@ -1241,7 +1175,7 @@ class GameManager:
             screen.blit(completion_text, completion_rect)
             
             articles_text = self.font_medium.render(
-                f"Illas sagradas recuperadas: {self.player.get_collected_count()}/19", 
+                f"Illas sagradas recuperadas: {len(self.player.articulos_collected)}/19", 
                 True, YELLOW
             )
             articles_rect = articles_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 0))
@@ -1250,38 +1184,39 @@ class GameManager:
             restart_text = self.font_medium.render("Presiona 'R' para reiniciar | 'M' para menú", True, YELLOW)
             restart_rect = restart_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 60))
             screen.blit(restart_text, restart_rect)
+    def run(self):
+        running = True
+        clock = pygame.time.Clock()
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                else:
+                    self.handle_event(event)
 
+            self.update()
+            self.draw(screen)
+            pygame.display.flip()
+            clock.tick(60)  # 60 FPS
 
+        pygame.quit()
 def main():
-    """Función principal del juego con estructura de árbol binario"""
-    print("🌳 Iniciando juego con estructura de árbol binario...")
-    print(f"📊 Datos organizados en árboles:")
-    print(f"   - Apus: {apus_tree.size} nodos")
-    print(f"   - Illas: {illas_tree.size} nodos")
-    print(f"   - Preguntas: {questions_tree.size} nodos")
-    print(f"   - Biomas: {biomes_tree.size} nodos")
-    print(f"   - Escenas con illas: {scene_illas_tree.size} nodos")
-    
     game = GameManager()
     running = True
-    
+    clock = pygame.time.Clock()
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             else:
-                result = game.handle_event(event)
-                if result == "QUIT":
-                    running = False
+                game.handle_event(event)
 
         game.update()
         game.draw(screen)
         pygame.display.flip()
-        clock.tick(FPS)
+        clock.tick(60)
 
     pygame.quit()
-    sys.exit()
-
 
 if __name__ == "__main__":
     main()
@@ -1291,4 +1226,6 @@ if __name__ == "__main__":
 
 
 
+
                         
+
