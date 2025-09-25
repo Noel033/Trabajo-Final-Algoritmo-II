@@ -1,0 +1,83 @@
+Narrador: Desde las alturas andinas, Ekeko, el dios de la abundancia, llegó a la Facultad de Ingeniería y Arquitectura para llenar de prosperidad a sus estudiantes. Su voz, un susurro de prosperidad, resuena en los pasillos, pero el cielo se oscurece. Desde las ruinas mochicas, se levanta la imponente figura de Ai Apaec, el creador, con el rostro marcado por la urgencia de milenios.
+Ai Apaec: Ekeko, las 19 Illas, la esencia misma de nuestra cultura, han sido robadas. El equilibrio del mundo se rompe. Necesitamos restaurar el orden antes de que la memoria se desvanezca por completo. Antes de partir, toma esta bendición: mi favor. Con él, tendrás tres oportunidades de redimir tu travesía si caes, una balanza sagrada gestionada con un contador de tipo entero.
+Ekeko: (La sonrisa del Ekeko se desvanece, sus ojos se llenan de una antigua determinación, la misma que mueve a los ríos). Entonces no hay un solo instante que perder. Guíame, Ai Apaec.
+Narrador: Así, la travesía de los dioses comenzó. Para recuperar las 19 Illas robadas y restaurar la armonía en la tierra, Ekeko y Ai Apaec debían recorrer los 12 reinos de los Apus, una ruta sagrada y peligrosa organizada en una lista secuencial de escenarios.
+________________________________________
+El primer desafío de Ekeko lo lleva al imponente Apu Huascarán, el señor de la Montaña Nevada. Ekeko se encuentra con el guardián de los picos más altos, un gigante de hielo que lo detiene con un viento cortante. El Apu le exige un tributo de sabiduría ancestral: "¿Qué civilización es conocida por sus impresionantes líneas trazadas en el desierto que solo pueden verse desde el aire?".
+•	A) Mochica
+•	B) Nazca
+•	C) Chavín
+•	D) Wari
+Ekeko, con la voz firme de la sabiduría, responde: Nazca. La respuesta es correcta y, como recompensa, dos Illas brillan en el aire: la poderosa Illa Tumi y la enigmática Illa Chacana.
+Con las Illas en su poder, el camino los guía hacia el reino de fuego del Apu Misti, un majestuoso Volcán que ruge con la energía del interior de la tierra. El Apu Misti le exige un tributo de conocimiento histórico. El Ekeko, con la sabiduría de la Pachamama, responde a la pregunta: "¿Cuál fue la capital del Imperio Inca?".
+•	A) Cusco
+•	B) Machu Picchu
+•	C) Ollantaytambo
+•	D) Sacsayhuamán
+Ekeko responde: Cusco. La respuesta es correcta y el Apu Misti le concede dos Illas que se alzan en el aire: la brillante Illa y el poderoso Torito.
+A continuación, Ekeko y Ai Apaec se adentran en el corazón de hielo del Apu Coropuna, un Glaciar donde la luz del sol apenas se atreve a tocar el suelo. Un guardián de piedra, el espíritu inmortal del Apu, los detiene. A la pregunta: "¿Qué cultura es famosa por sus huacos retratos y su avanzada metalurgia?".
+•	A) Nazca
+•	B) Chavín
+•	C) Mochica
+•	D) Chimú
+Ekeko responde con convicción: Mochica. La respuesta es correcta y Ekeko recupera dos Illas que emanan un calor inesperado en medio del frío: el Perro Viringo y el Cuy.
+La travesía los lleva a un Altiplano donde el aire es escaso y la historia se siente en la piel, el reino del Apu Ampato. Este Apu, el guardián de los secretos de las alturas, les exige un tributo de conocimiento de los sistemas de registro andinos. A la pregunta "¿Cuál es el nombre del sistema de nudos usado por los incas para registrar información?".
+•	A) Quipu
+•	B) Tocapu
+•	C) Ayllu
+•	D) Mit'a
+Ekeko responde: Quipu. La respuesta es correcta y se materializan las Illas Qullqi y Quispe, que brillan con la luz de los tesoros incas.
+El siguiente desafío los lleva al Apu Chachani, el señor del Desierto Alto, un bioma de arena y roca. El Apu, un ser de una antigua soledad, le exige un tributo de conocimiento histórico. A la pregunta "¿Qué cultura construyó el famoso templo de Chavín de Huántar?".
+•	A) Wari
+•	B) Tiahuanaco
+•	C) Chavín
+•	D) Paracas
+Ekeko responde con la sabiduría de los sabios: Chavín. Las Illas Qori y Chuño se materializan.
+Después de este desafío, los héroes llegan al Volcán Activo del Apu Sabancaya. El Apu, guardián del fuego y de la fertilidad de la tierra, les pide un tributo de conocimiento sobre la base de la alimentación andina. Ekeko responde correctamente a la pregunta "¿Cómo se llamaba el emperador inca cuando llegaron los españoles?".
+•	A) Huáscar
+•	B) Atahualpa
+•	C) Manco Inca
+•	D) Túpac Amaru
+Ekeko responde: Atahualpa. La respuesta es correcta y se materializan las Illas Papa y Maíz.
+El camino los guía al Pico Nevado del Apu Alpamayo. El Apu, un ser de una belleza helada y de un conocimiento ancestral, les exige una respuesta sobre las antiguas culturas. Ekeko responde con sabiduría a la pregunta: "¿Qué cultura creó los famosos mantos de Paracas?".
+•	A) Paracas
+•	B) Nazca
+•	C) Ica
+•	D) Chincha
+Ekeko responde: Paracas. La Illa Calluha se une a su bolsa, un tesoro único en su clase.
+A continuación, el viaje continúa en la vasta Cordillera del Apu Yerupajá, un lugar de senderos estrechos y acantilados que desafían a la muerte. El Apu, el guardián de los valles, les exige un tributo de conocimiento sobre la cultura de la costa. A la pregunta "¿Cuál era la moneda de intercambio principal en el Imperio Inca?".
+•	A) Oro
+•	B) Plata
+•	C) No usaban moneda
+•	D) Cobre
+Ekeko responde: No usaban moneda. La respuesta es correcta y Ekeko recupera la Illa Cungalpo.
+Después de superar este desafío, la travesía los lleva a la Laguna Sagrada del Apu Ausangate. El guardián de las aguas le pide a Ekeko que demuestre su respeto por la mitología andina. El Apu le pregunta: "¿Qué significa 'Tahuantinsuyu'?".
+•	A) Casa del Sol
+•	B) Cuatro regiones
+•	C) Gran Imperio
+•	D) Tierra Sagrada
+Ekeko responde: Cuatro regiones. La Illa Hizanche se une a su colección, un destello de luz sagrada en la bolsa del Ekeko.
+El paisaje cambia abruptamente y los lleva a la Selva Alta del Apu Salkantay, un lugar donde la vegetación se entrelaza y la neblina oculta los secretos del pasado. El Apu le pregunta: "¿Qué cultura desarrolló la técnica agrícola de andenes o terrazas?".
+•	A) Nazca
+•	B) Inca
+•	C) Wari
+•	D) Todas las anteriores
+Ekeko responde con la sabiduría de los agrónomos ancestrales: Todas las anteriores. La Illa Huashacara se materializa.
+Los héroes se encuentran en el Valle Glaciar del Apu Chopicalqui, un lugar de picos nevados y un valle verde. El Apu, el guardián de las leyendas, le pide a Ekeko una respuesta sobre las deidades incas. A la pregunta "¿Cómo se llamaba el dios principal de los incas?".
+•	A) Viracocha
+•	B) Inti
+•	C) Mama Quilla
+•	D) Pachacamac
+Ekeko responde con determinación: Inti. Una Illa con forma de Inti se une a su colección.
+La travesía culmina en la Cima Suprema del Apu Cotopaxi, el último desafío. El Apu, el amo de los cielos andinos, le exige a Ekeko un tributo sobre el balance del universo. Ekeko responde con su último esfuerzo a la pregunta: "¿Cuál fue la primera capital de los incas antes de Cusco?".
+•	A) Paqariq Tampu
+•	B) Ollantaytambo
+•	C) Pisaq
+•	D) Machu Picchu
+Ekeko responde: Paqariq Tampu. Las dos Illas finales, Killa y Chaska, se unen a su colección, y un destello de luz envuelve al Ekeko.
+________________________________________
+El Final del Recorrido
+Narrador: Con las 19 Illas recuperadas, el suelo bajo los pies de Ekeko se transforma. El mundo andino se manifiesta, y el destino de los dioses se revela.
+Ai Apaec: El equilibrio está a salvo. Gracias, Ekeko. No solo recuperaste las Illas, sino que demostraste que la sabiduría de nuestros ancestros sigue viva. Ahora el mundo está a salvo y la prosperidad regresará a los campos.
+Ekeko: Y un poquito de buena suerte tampoco hace daño, waikis.
+Narrador: Con su misión cumplida, los dos héroes se despiden de los Apus. El Ekeko, con su bolsa de miniaturas llena de prosperidad, regresa a la FIA para seguir bendiciendo a los estudiantes. La travesía ha terminado... por ahora.
