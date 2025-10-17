@@ -13,7 +13,7 @@ pygame.mixer.init()  # Inicializar el mixer para sonido
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("La Travesía de Ekeko - 12 Escenas")
+pygame.display.set_caption("La Travesía de Ekeko - 14 Escenas")
 
 # Colores
 WHITE = (255, 255, 255)
@@ -39,61 +39,72 @@ class NodoApu:
         self.derecha = None
 
 class ArbolApus:
-    """Árbol binario para gestionar los 12 Apus del juego"""
+    """Árbol binario para gestionar los 12 Apus del juego
+    
+    FUNCIONAMIENTO DEL ÁRBOL BINARIO:
+    - Se ordena alfabéticamente por nombre del Apu
+    - Al insertar: nombres menores van a la izquierda, mayores a la derecha
+    - Al buscar: compara alfabéticamente y navega por el árbol
+    - Al recorrer: visita izquierda → raíz → derecha (orden alfabético)
+    - Al cambiar de nivel: se mueve automáticamente según la comparación alfabética
+    """
     def __init__(self):
         self.raiz = None
         self.total_apus = 0
     
     def insertar(self, nombre, datos):
-        """Inserta un nuevo Apu en el árbol binario"""
+        """Inserta un nuevo Apu en el árbol binario ordenado alfabéticamente"""
         if self.raiz is None:
             self.raiz = NodoApu(nombre, datos)  # # INSERTAR APU: Raíz del árbol
             self.total_apus += 1
+            print(f"🌳 Insertando {nombre} como RAÍZ del árbol")
         else:
             self._insertar_recursivo(self.raiz, nombre, datos)
     
     def _insertar_recursivo(self, nodo, nombre, datos):
-        """Método recursivo para insertar un Apu"""
+        """Método recursivo para insertar un Apu - ORDENA ALFABÉTICAMENTE"""
         if nombre < nodo.nombre:
             if nodo.izquierda is None:
                 nodo.izquierda = NodoApu(nombre, datos)  # # INSERTAR APU: Hijo izquierdo
                 self.total_apus += 1
+                print(f"🌳 Insertando {nombre} a la IZQUIERDA de {nodo.nombre}")
             else:
                 self._insertar_recursivo(nodo.izquierda, nombre, datos)
         elif nombre > nodo.nombre:
             if nodo.derecha is None:
                 nodo.derecha = NodoApu(nombre, datos)  # # INSERTAR APU: Hijo derecho
                 self.total_apus += 1
+                print(f"🌳 Insertando {nombre} a la DERECHA de {nodo.nombre}")
             else:
                 self._insertar_recursivo(nodo.derecha, nombre, datos)
     
     def buscar(self, nombre):
-        """Busca un Apu por su nombre en el árbol"""
+        """Busca un Apu por su nombre en el árbol - NAVEGA POR NIVELES"""
         return self._buscar_recursivo(self.raiz, nombre)
     
     def _buscar_recursivo(self, nodo, nombre):
-        """Método recursivo para buscar un Apu"""
+        """Método recursivo para buscar un Apu - RECORRE NIVELES DEL ÁRBOL"""
         if nodo is None:
             return None
         if nodo.nombre == nombre:
             return nodo
         elif nombre < nodo.nombre:
-            return self._buscar_recursivo(nodo.izquierda, nombre)
+            return self._buscar_recursivo(nodo.izquierda, nombre)  # Baja al nivel izquierdo
         else:
-            return self._buscar_recursivo(nodo.derecha, nombre)
+            return self._buscar_recursivo(nodo.derecha, nombre)  # Baja al nivel derecho
     
     def recorrer_inorden(self):
-        """Recorre el árbol en orden (izquierda, raíz, derecha)"""
+        """Recorre el árbol en orden (izquierda, raíz, derecha) - ORDEN ALFABÉTICO"""
         apus_ordenados = []
         self._inorden_recursivo(self.raiz, apus_ordenados)
         return apus_ordenados
     
     def _inorden_recursivo(self, nodo, lista):
-        """Recorrido inorden recursivo"""
+        """Recorrido inorden recursivo - VISITA TODOS LOS NIVELES"""
         if nodo is not None:
-            self._inorden_recursivo(nodo.izquierda, lista)
-            lista.append(nodo)
-            self._inorden_recursivo(nodo.derecha, lista)
+            self._inorden_recursivo(nodo.izquierda, lista)  # Recorre subárbol izquierdo
+            lista.append(nodo)  # Procesa nodo actual
+            self._inorden_recursivo(nodo.derecha, lista)  # Recorre subárbol derecho
     
     def obtener_apu_por_indice(self, indice):
         """Obtiene un Apu por su índice en el recorrido inorden"""
@@ -116,26 +127,245 @@ class ArbolApus:
         print(f"Total de Apus: {self.total_apus}")
     
     def _mostrar_recursivo(self, nodo, nivel):
-        """Muestra recursivamente la estructura del árbol"""
+        """Muestra recursivamente la estructura del árbol - MUESTRA NIVELES"""
         if nodo is not None:
             self._mostrar_recursivo(nodo.derecha, nivel + 1)
             print("  " * nivel + f"├─ {nodo.nombre} ({nodo.datos['bioma']})")
             self._mostrar_recursivo(nodo.izquierda, nivel + 1)
 
-# ================== DATOS DEL JUEGO ==================
+# ================== CLASES ESPECÍFICAS PARA CADA APU CON SU BIOMA ==================
+
+class ApuBase:
+    """Clase base para todos los Apus"""
+    def __init__(self, nombre, color, health, bioma, gif):
+        self.nombre = nombre
+        self.color = color
+        self.health = health
+        self.bioma = bioma
+        self.gif = gif
+        self.illas_robadas = []
+    
+    def get_datos(self):
+        """Retorna los datos del Apu en formato compatible con el árbol binario"""
+        return {
+            "color": self.color,
+            "health": self.health,
+            "bioma": self.bioma,
+            "gif": self.gif
+        }
+
+class ApuHuascaran(ApuBase):
+    """Apu Huascarán - Montaña Nevada"""
+    def __init__(self):
+        super().__init__(
+            nombre="Huascarán",
+            color=(255, 255, 255),
+            health=100,
+            bioma="Montaña Nevada",
+            gif="Huascaran.gif"
+        )
+        self.illas_robadas = ["Tumi", "Chacana"]
+        self.altura = 6768  # metros
+        self.caracteristicas = ["Pico más alto del Perú", "Nevado permanente", "Parque Nacional"]
+
+class ApuCoropuna(ApuBase):
+    """Apu Coropuna - Glaciar"""
+    def __init__(self):
+        super().__init__(
+            nombre="Coropuna",
+            color=(200, 200, 255),
+            health=90,
+            bioma="Glaciar",
+            gif="coropuna.gif"
+        )
+        self.illas_robadas = ["Perro Viringo", "Cuy"]
+        self.altura = 6425  # metros
+        self.caracteristicas = ["Volcán extinto", "Glaciar extenso", "Reserva natural"]
+
+class ApuMisti(ApuBase):
+    """Apu Misti - Volcán"""
+    def __init__(self):
+        super().__init__(
+            nombre="Misti",
+            color=(255, 150, 150),
+            health=85,
+            bioma="Volcán",
+            gif="Misti.png"
+        )
+        self.illas_robadas = ["Illa", "Torito"]
+        self.altura = 5822  # metros
+        self.caracteristicas = ["Volcán activo", "Cerca de Arequipa", "Forma cónica perfecta"]
+
+class ApuAmpato(ApuBase):
+    """Apu Ampato - Altiplano"""
+    def __init__(self):
+        super().__init__(
+            nombre="Ampato",
+            color=(150, 255, 150),
+            health=95,
+            bioma="Altiplano",
+            gif="Ampato.png"
+        )
+        self.illas_robadas = ["Qullqi", "Quispe"]
+        self.altura = 6288  # metros
+        self.caracteristicas = ["Volcán inactivo", "Zona de altiplano", "Clima frío"]
+
+class ApuSaraSara(ApuBase):
+    """Apu Sara Sara - Volcán Andino"""
+    def __init__(self):
+        super().__init__(
+            nombre="Sara Sara",
+            color=(255, 100, 100),
+            health=88,
+            bioma="Volcán Andino",
+            gif="SaraSara.png"
+        )
+        self.illas_robadas = ["Papa", "Maíz"]
+        self.altura = 5505  # metros
+        self.caracteristicas = ["Volcán andino", "Zona de Ayacucho", "Forma cónica"]
+
+class ApuSalkantay(ApuBase):
+    """Apu Salkantay - Selva Alta"""
+    def __init__(self):
+        super().__init__(
+            nombre="Salkantay",
+            color=(100, 255, 200),
+            health=90,
+            bioma="Selva Alta",
+            gif="Salkantay.png"
+        )
+        self.illas_robadas = ["Huashacara"]
+        self.altura = 6271  # metros
+        self.caracteristicas = ["Transición a selva", "Biodiversidad única", "Camino a Machu Picchu"]
+
+class ApuChachani(ApuBase):
+    """Apu Chachani - Desierto Alto"""
+    def __init__(self):
+        super().__init__(
+            nombre="Chachani",
+            color=(255, 200, 100),
+            health=80,
+            bioma="Desierto Alto",
+            gif="Chachani.png"
+        )
+        self.illas_robadas = ["Qori", "Chuño"]
+        self.altura = 6057  # metros
+        self.caracteristicas = ["Volcán extinto", "Desierto de altura", "Arena volcánica"]
+
+class ApuCcarhuarazo(ApuBase):
+    """Apu Ccarhuarazo - Cordillera Central"""
+    def __init__(self):
+        super().__init__(
+            nombre="Ccarhuarazo",
+            color=(180, 180, 255),
+            health=92,
+            bioma="Cordillera Central",
+            gif="coropuna.gif"
+        )
+        self.illas_robadas = ["Cungalpo"]
+        self.altura = 5120  # metros
+        self.caracteristicas = ["Cordillera central", "Zona de Huancavelica", "Nevado"]
+
+class ApuRasuwillka(ApuBase):
+    """Apu Rasuwillka - Montaña Sagrada"""
+    def __init__(self):
+        super().__init__(
+            nombre="Rasuwillka",
+            color=(255, 180, 255),
+            health=95,
+            bioma="Montaña Sagrada",
+            gif="coropuna.gif"
+        )
+        self.illas_robadas = ["Hizanche"]
+        self.altura = 6000  # metros
+        self.caracteristicas = ["Montaña sagrada", "Zona de Cusco", "Peregrinación"]
+
+class ApuHualcaHualca(ApuBase):
+    """Apu Hualca Hualca - Volcán Nevado"""
+    def __init__(self):
+        super().__init__(
+            nombre="Hualca Hualca",
+            color=(200, 255, 255),
+            health=87,
+            bioma="Volcán Nevado",
+            gif="coropuna.gif"
+        )
+        self.illas_robadas = ["Calluha"]
+        self.altura = 6025  # metros
+        self.caracteristicas = ["Volcán nevado", "Zona de Arequipa", "Forma cónica"]
+
+class ApuUarancante(ApuBase):
+    """Apu Uarancante - Pico Andino"""
+    def __init__(self):
+        super().__init__(
+            nombre="Uarancante",
+            color=(255, 255, 150),
+            health=89,
+            bioma="Pico Andino",
+            gif="coropuna.gif"
+        )
+        self.illas_robadas = ["Inti"]
+        self.altura = 5800  # metros
+        self.caracteristicas = ["Pico andino", "Zona de Puno", "Nevado"]
+
+class ApuAllincapac(ApuBase):
+    """Apu Allincapac - Montaña Dorada"""
+    def __init__(self):
+        super().__init__(
+            nombre="Allincapac",
+            color=(255, 215, 0),
+            health=93,
+            bioma="Montaña Dorada",
+            gif="coropuna.gif"
+        )
+        self.illas_robadas = ["Killa"]
+        self.altura = 5900  # metros
+        self.caracteristicas = ["Montaña dorada", "Zona de Apurímac", "Sagrada"]
+
+class ApuKatunqui(ApuBase):
+    """Apu Katunqui - Volcán Inactivo"""
+    def __init__(self):
+        super().__init__(
+            nombre="Katunqui",
+            color=(200, 100, 255),
+            health=85,
+            bioma="Volcán Inactivo",
+            gif="coropuna.gif"
+        )
+        self.illas_robadas = ["Chaska"]
+        self.altura = 5700  # metros
+        self.caracteristicas = ["Volcán inactivo", "Zona de Moquegua", "Forma redondeada"]
+
+class ApuPatallacta(ApuBase):
+    """Apu Patallacta - Ruinas Sagradas"""
+    def __init__(self):
+        super().__init__(
+            nombre="Patallacta",
+            color=(139, 69, 19),
+            health=100,
+            bioma="Ruinas Sagradas",
+            gif="coropuna.gif"
+        )
+        self.illas_robadas = ["Qullqi", "Quispe"]
+        self.altura = 2800  # metros
+        self.caracteristicas = ["Ruinas sagradas", "Zona de Cusco", "Sitio arqueológico"]
+
+# ================== DATOS DEL JUEGO (COMPATIBILIDAD) ==================
 APUS_DATA = {
-    "Huascarán": {"color": (255, 255, 255), "health": 100, "bioma": "Montaña Nevada", "gif": "coropuna.gif"},
-    "Misti": {"color": (255, 150, 150), "health": 85, "bioma": "Volcán", "gif": "coropuna.gif"},
-    "Coropuna": {"color": (200, 200, 255), "health": 90, "bioma": "Glaciar", "gif": "coropuna.gif"},
-    "Ampato": {"color": (150, 255, 150), "health": 95, "bioma": "Altiplano", "gif": "ampato.gif"},
-    "Chachani": {"color": (255, 200, 100), "health": 80, "bioma": "Desierto Alto", "gif": "coropuna.gif"},
-    "Sabancaya": {"color": (255, 100, 100), "health": 88, "bioma": "Volcán Activo", "gif": "coropuna.gif"},
-    "Alpamayo": {"color": (200, 255, 255), "health": 92, "bioma": "Pico Nevado", "gif": "coropuna.gif"},
-    "Yerupajá": {"color": (180, 180, 255), "health": 98, "bioma": "Cordillera", "gif": "coropuna.gif"},
-    "Ausangate": {"color": (255, 180, 255), "health": 85, "bioma": "Laguna Sagrada", "gif": "coropuna.gif"},
-    "Salkantay": {"color": (100, 255, 200), "health": 90, "bioma": "Selva Alta", "gif": "coropuna.gif"},
-    "Chopicalqui": {"color": (255, 255, 150), "health": 87, "bioma": "Valle Glaciar", "gif": "coropuna.gif"},
-    "Cotopaxi": {"color": (200, 100, 255), "health": 100, "bioma": "Cima Suprema", "gif": "coropuna.gif"}
+    "Huascarán": ApuHuascaran().get_datos(),
+    "Coropuna": ApuCoropuna().get_datos(),
+    "Misti": ApuMisti().get_datos(),
+    "Ampato": ApuAmpato().get_datos(),
+    "Sara Sara": ApuSaraSara().get_datos(),
+    "Salkantay": ApuSalkantay().get_datos(),
+    "Chachani": ApuChachani().get_datos(),
+    "Ccarhuarazo": ApuCcarhuarazo().get_datos(),
+    "Rasuwillka": ApuRasuwillka().get_datos(),
+    "Hualca Hualca": ApuHualcaHualca().get_datos(),
+    "Uarancante": ApuUarancante().get_datos(),
+    "Allincapac": ApuAllincapac().get_datos(),
+    "Katunqui": ApuKatunqui().get_datos(),
+    "Patallacta": ApuPatallacta().get_datos()
 }
 
 # GIFs de fondo para cada escena/bioma
@@ -170,37 +400,46 @@ BIOMA_MUSIC = [
     "musica12_cotopaxi.mp3"           # Cotopaxi
 ]
 
-# Illas robadas divididas entre los 12 Apus (19 artículos total)
+# ================== ARRAYS/LISTAS DONDE SE GUARDAN LAS ILLAS ==================
+# 📦 ILLAS_ROBADAS_POR_ESCENA: Array principal donde se guardan las illas por escena
+# 📦 ILLAS_GIFS: Diccionario que mapea cada illa con su archivo GIF
+# 📦 player.articulos_collected: Lista donde se guardan las illas recolectadas por el jugador
+
+# Illas robadas divididas entre los 14 Apus (19 artículos total)
 ILLAS_ROBADAS_POR_ESCENA = [
     # Escena 1 - Huascarán (2 illas)
     ["Tumi", "Chacana"],
-    # Escena 2 - Misti (2 illas)  
-    ["Illa", "Torito"],
-    # Escena 3 - Coropuna (2 illas)
+    # Escena 2 - Coropuna (2 illas)
     ["Perro Viringo", "Cuy"],
+    # Escena 3 - Misti (2 illas)  
+    ["Illa", "Torito"],
     # Escena 4 - Ampato (2 illas)
     ["Qullqi", "Quispe"],
-    # Escena 5 - Chachani (2 illas)
-    ["Qori", "Chuño"],
-    # Escena 6 - Sabancaya (2 illas)
+    # Escena 5 - Sara Sara (2 illas)
     ["Papa", "Maíz"],
-    # Escena 7 - Alpamayo (1 illa)
-    ["Calluha"],
-    # Escena 8 - Yerupajá (1 illa)
-    ["Cungalpo"],
-    # Escena 9 - Ausangate (1 illa)
-    ["Hizanche"],
-    # Escena 10 - Salkantay (1 illa)
+    # Escena 6 - Salkantay (1 illa)
     ["Huashacara"],
-    # Escena 11 - Chopicalqui (1 illa)
+    # Escena 7 - Chachani (2 illas)
+    ["Qori", "Chuño"],
+    # Escena 8 - Ccarhuarazo (1 illa)
+    ["Cungalpo"],
+    # Escena 9 - Rasuwillka (1 illa)
+    ["Hizanche"],
+    # Escena 10 - Hualca Hualca (1 illa)
+    ["Calluha"],
+    # Escena 11 - Uarancante (1 illa)
     ["Inti"],
-    # Escena 12 - Cotopaxi (2 illas restantes)
-    ["Killa", "Chaska"]
+    # Escena 12 - Allincapac (1 illa)
+    ["Killa"],
+    # Escena 13 - Katunqui (1 illa)
+    ["Chaska"],
+    # Escena 14 - Patallacta (2 illas restantes)
+    ["Qullqi", "Quispe"]
 ]
 
 # GIFs para cada illa robada
 ILLAS_GIFS = {
-    "Tumi": "tumi.gif",
+    "Tumi": "tumi.gif",   
     "Chacana": "chacana.gif", 
     "Illa": "illa.gif",
     "Torito": "torito.gif",
@@ -410,12 +649,16 @@ class MainMenu:
         pygame.draw.rect(self.static_background, (34, 139, 34), (0, SCREEN_HEIGHT - 150, SCREEN_WIDTH, 150))
 
     def handle_input(self, event):
+        """🎮 BOTONES PARA NAVEGAR EN EL MENÚ:
+        - ↑↓: Navegar entre opciones del menú
+        - ENTER: Seleccionar opción
+        """
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP and self.selected_option > 0:
+            if event.key == pygame.K_UP and self.selected_option > 0:  # 🎮 BOTÓN ARRIBA
                 self.selected_option -= 1
-            elif event.key == pygame.K_DOWN and self.selected_option < len(self.options) - 1:
+            elif event.key == pygame.K_DOWN and self.selected_option < len(self.options) - 1:  # 🎮 BOTÓN ABAJO
                 self.selected_option += 1
-            elif event.key == pygame.K_RETURN:
+            elif event.key == pygame.K_RETURN:  # 🎮 BOTÓN SELECCIONAR
                 return self.options[self.selected_option]
         return None
 
@@ -442,7 +685,7 @@ class MainMenu:
         screen.blit(title_text, title_rect)
         
         # Subtítulo
-        subtitle_text = self.font_subtitle.render("Rescata las 19 Illas Sagradas de los 12 Apus", True, YELLOW)
+        subtitle_text = self.font_subtitle.render("Rescata las 19 Illas Sagradas de los 14 Apus", True, YELLOW)
         subtitle_rect = subtitle_text.get_rect(center=(SCREEN_WIDTH // 2, 200))
         screen.blit(subtitle_text, subtitle_rect)
         
@@ -494,7 +737,7 @@ class InstructionsScreen:
         # Instrucciones
         instructions = [
             "🎯 OBJETIVO:",
-            "Ayuda a Ekeko a recuperar las 19 Illas Sagradas robadas por los 12 Apus",
+            "Ayuda a Ekeko a recuperar las 19 Illas Sagradas robadas por los 14 Apus",
             "",
             "🕹️ CONTROLES:",
             "• Flechas ← → o A/D: Mover",
@@ -618,17 +861,23 @@ class Player:
             self.image = self.original_frames[0]
 
     def handle_input(self, keys):
+        """🎮 BOTONES PARA MOVER AL PERSONAJE EKeko:
+        - Flechas ← → o teclas A/D: Mover izquierda/derecha
+        - Espacio o ↑: Saltar
+        - ↑↓: Navegar en preguntas (en QuestionScreen)
+        - ENTER: Confirmar respuesta (en QuestionScreen)
+        """
         self.vel_x = 0
         self.walking = False
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:  # 🎮 BOTÓN IZQUIERDA
             self.vel_x = -self.speed
             self.facing_right = False
             self.walking = True
-        elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+        elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:  # 🎮 BOTÓN DERECHA
             self.vel_x = self.speed
             self.facing_right = True
             self.walking = True
-        if (keys[pygame.K_SPACE] or keys[pygame.K_UP]) and self.on_ground:
+        if (keys[pygame.K_SPACE] or keys[pygame.K_UP]) and self.on_ground:  # 🎮 BOTÓN SALTO
             self.vel_y = self.jump_strength
             self.on_ground = False
 
@@ -809,13 +1058,17 @@ class QuestionScreen:
         self.result_timer = 0
 
     def handle_input(self, event):
+        """🎮 BOTONES PARA NAVEGAR EN LAS PREGUNTAS:
+        - ↑↓: Navegar entre opciones de respuesta
+        - ENTER: Confirmar respuesta seleccionada
+        """
         if not self.answered:
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP and self.selected_option > 0:
+                if event.key == pygame.K_UP and self.selected_option > 0:  # 🎮 BOTÓN ARRIBA
                     self.selected_option -= 1
-                elif event.key == pygame.K_DOWN and self.selected_option < len(self.pregunta_data["opciones"]) - 1:
+                elif event.key == pygame.K_DOWN and self.selected_option < len(self.pregunta_data["opciones"]) - 1:  # 🎮 BOTÓN ABAJO
                     self.selected_option += 1
-                elif event.key == pygame.K_RETURN:
+                elif event.key == pygame.K_RETURN:  # 🎮 BOTÓN CONFIRMAR
                     self.answered = True
                     self.correct = (self.selected_option == self.pregunta_data["respuesta_correcta"])
                     self.show_result = True
@@ -1014,7 +1267,7 @@ class GameScene:
         else:
             bioma = APUS_DATA.get(self.apu_name, {}).get('bioma', 'Desconocido')
         
-        scene_text = font.render(f"Escena {self.scene_number + 1}/12 - {bioma}", True, WHITE)
+        scene_text = font.render(f"Escena {self.scene_number + 1}/14 - {bioma}", True, WHITE)
         screen.blit(scene_text, (10, 10))
         
         draw_pixelated_hearts(screen, player.lives, player.max_lives, 10, 40)
@@ -1121,7 +1374,7 @@ class AnimatedBackground:
 class GameManager:
     def __init__(self):
         self.current_scene = 0
-        self.total_scenes = 12
+        self.total_scenes = 14  # Actualizado a 14 Apus
         self.scenes = []
         self.player = Player(100, SCREEN_HEIGHT - 250, gif_path="gif.gif", scale_factor=0.1)
         self.background = AnimatedBackground(scene_number=0)
@@ -1131,7 +1384,7 @@ class GameManager:
 
         # ✅ Árbol binario de Apus
         self.arbol_apus = ArbolApus()
-        self.poblar_arbol_apus()  # Poblar el árbol con los 12 Apus
+        self.poblar_arbol_apus()  # Poblar el árbol con los 14 Apus
 
         # ✅ Menú principal
         self.main_menu = MainMenu()
@@ -1147,22 +1400,21 @@ class GameManager:
 
 
     def poblar_arbol_apus(self):
-        """Poblar el árbol binario con los 12 Apus del juego"""
-        print("🌳 Poblando árbol binario con los 12 Apus...")
+        """Poblar el árbol binario con los 14 Apus del juego usando clases específicas"""
+        print("🌳 Poblando árbol binario con los 14 Apus usando clases específicas...")
+        
+        # Crear instancias de cada clase de Apu (en orden de la lista de Ekeko)
+        apus_instancias = [
+            ApuHuascaran(), ApuCoropuna(), ApuMisti(), ApuAmpato(),
+            ApuSaraSara(), ApuSalkantay(), ApuChachani(), ApuCcarhuarazo(),
+            ApuRasuwillka(), ApuHualcaHualca(), ApuUarancante(), ApuAllincapac(),
+            ApuKatunqui(), ApuPatallacta()
+        ]
         
         # Insertar todos los Apus en el árbol binario
-        self.arbol_apus.insertar("Huascarán", APUS_DATA["Huascarán"])  # # INSERTAR APU: Huascarán
-        self.arbol_apus.insertar("Misti", APUS_DATA["Misti"])  # # INSERTAR APU: Misti
-        self.arbol_apus.insertar("Coropuna", APUS_DATA["Coropuna"])  # # INSERTAR APU: Coropuna
-        self.arbol_apus.insertar("Ampato", APUS_DATA["Ampato"])  # # INSERTAR APU: Ampato
-        self.arbol_apus.insertar("Chachani", APUS_DATA["Chachani"])  # # INSERTAR APU: Chachani
-        self.arbol_apus.insertar("Sabancaya", APUS_DATA["Sabancaya"])  # # INSERTAR APU: Sabancaya
-        self.arbol_apus.insertar("Alpamayo", APUS_DATA["Alpamayo"])  # # INSERTAR APU: Alpamayo
-        self.arbol_apus.insertar("Yerupajá", APUS_DATA["Yerupajá"])  # # INSERTAR APU: Yerupajá
-        self.arbol_apus.insertar("Ausangate", APUS_DATA["Ausangate"])  # # INSERTAR APU: Ausangate
-        self.arbol_apus.insertar("Salkantay", APUS_DATA["Salkantay"])  # # INSERTAR APU: Salkantay
-        self.arbol_apus.insertar("Chopicalqui", APUS_DATA["Chopicalqui"])  # # INSERTAR APU: Chopicalqui
-        self.arbol_apus.insertar("Cotopaxi", APUS_DATA["Cotopaxi"])  # # INSERTAR APU: Cotopaxi
+        for apu in apus_instancias:
+            self.arbol_apus.insertar(apu.nombre, apu.get_datos())
+            print(f"🏔️ {apu.nombre} ({apu.bioma}) - Altura: {apu.altura}m - Illas: {apu.illas_robadas}")
         
         print(f"✅ Árbol binario poblado con {self.arbol_apus.total_apus} Apus")
         # Mostrar estructura del árbol para debugging
@@ -1192,6 +1444,14 @@ class GameManager:
         apu_por_indice = self.arbol_apus.obtener_apu_por_indice(0)
         if apu_por_indice:
             print(f"\n🎯 Primer Apu en orden alfabético: {apu_por_indice.nombre}")
+        
+        # 4. Mostrar cómo funciona el recorrido por niveles
+        print("\n🌳 FUNCIONAMIENTO DEL ÁRBOL BINARIO:")
+        print("• ORDENACIÓN: Los Apus se ordenan alfabéticamente")
+        print("• INSERCIÓN: Nombres menores van a la IZQUIERDA, mayores a la DERECHA")
+        print("• BÚSQUEDA: Compara alfabéticamente y navega por niveles")
+        print("• RECORRIDO: Visita izquierda → raíz → derecha (orden alfabético)")
+        print("• CAMBIO DE NIVEL: Automático según comparación alfabética")
         
         print("=" * 60)
 
@@ -1305,7 +1565,7 @@ class GameManager:
             self.player.draw(screen)
             self.scenes[self.current_scene].draw(screen, self.player)
             
-            progress_text = self.font_medium.render(f"Progreso: {self.current_scene + 1}/{self.total_scenes}", True, WHITE)
+            progress_text = self.font_medium.render(f"Progreso: {self.current_scene + 1}/14", True, WHITE)
             screen.blit(progress_text, (SCREEN_WIDTH - 200, 10))
             
         elif self.game_state == "GAME_OVER":
@@ -1340,7 +1600,7 @@ class GameManager:
             victory_rect = victory_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 90))
             screen.blit(victory_text, victory_rect)
             
-            completion_text = self.font_medium.render("¡Ekeko completó su aventura por los 12 Apus!", True, WHITE)
+            completion_text = self.font_medium.render("¡Ekeko completó su aventura por los 14 Apus!", True, WHITE)
             completion_rect = completion_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 40))
             screen.blit(completion_text, completion_rect)
             
