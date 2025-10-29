@@ -1,0 +1,76 @@
+{
+  "preguntas": [
+    {
+      "apu": "Huascarán",
+      "pregunta": "¿Qué civilización es conocida por sus impresionantes líneas trazadas en el desierto que solo pueden verse desde el aire?",
+      "opciones": ["Mochica", "Nazca", "Chavín", "Wari"],
+      "respuesta_correcta": 1
+    },
+    {
+      "apu": "Misti",
+      "pregunta": "¿Cuál fue la capital del Imperio Inca?",
+      "opciones": ["Cusco", "Machu Picchu", "Ollantaytambo", "Sacsayhuamán"],
+      "respuesta_correcta": 0
+    },
+    {
+      "apu": "Coropuna",
+      "pregunta": "¿Qué cultura es famosa por sus huacos retratos y su avanzada metalurgia?",
+      "opciones": ["Nazca", "Chavín", "Mochica", "Chimú"],
+      "respuesta_correcta": 2
+    },
+    {
+      "apu": "Ampato",
+      "pregunta": "¿Cuál es el nombre del sistema de nudos usado por los incas para registrar información?",
+      "opciones": ["Quipu", "Tocapu", "Ayllu", "Mit'a"],
+      "respuesta_correcta": 0
+    },
+    {
+      "apu": "Chachani",
+      "pregunta": "¿Qué cultura construyó el famoso templo de Chavín de Huántar?",
+      "opciones": ["Wari", "Tiahuanaco", "Chavín", "Paracas"],
+      "respuesta_correcta": 2
+    },
+    {
+      "apu": "Sabancaya",
+      "pregunta": "¿Cómo se llamaba el emperador inca cuando llegaron los españoles?",
+      "opciones": ["Huáscar", "Atahualpa", "Manco Inca", "Túpac Amaru"],
+      "respuesta_correcta": 1
+    },
+    {
+      "apu": "Alpamayo",
+      "pregunta": "¿Qué cultura creó los famosos mantos de Paracas?",
+      "opciones": ["Paracas", "Nazca", "Ica", "Chincha"],
+      "respuesta_correcta": 0
+    },
+    {
+      "apu": "Yerupajá",
+      "pregunta": "¿Cuál era la moneda de intercambio principal en el Imperio Inca?",
+      "opciones": ["Oro", "Plata", "No usaban moneda", "Cobre"],
+      "respuesta_correcta": 2
+    },
+    {
+      "apu": "Ausangate",
+      "pregunta": "¿Qué significa 'Tahuantinsuyu'?",
+      "opciones": ["Casa del Sol", "Cuatro regiones", "Gran Imperio", "Tierra Sagrada"],
+      "respuesta_correcta": 1
+    },
+    {
+      "apu": "Salkantay",
+      "pregunta": "¿Qué cultura desarrolló la técnica agrícola de andenes o terrazas?",
+      "opciones": ["Nazca", "Inca", "Wari", "Todas las anteriores"],
+      "respuesta_correcta": 3
+    },
+    {
+      "apu": "Chopicalqui",
+      "pregunta": "¿Cómo se llamaba el dios principal de los incas?",
+      "opciones": ["Viracocha", "Inti", "Mama Quilla", "Pachacamac"],
+      "respuesta_correcta": 1
+    },
+    {
+      "apu": "Cotopaxi",
+      "pregunta": "¿Cuál fue la primera capital de los incas antes de Cusco?",
+      "opciones": ["Paqariq Tampu", "Ollantaytambo", "Pisaq", "Machu Picchu"],
+      "respuesta_correcta": 0
+    }
+  ]
+}
